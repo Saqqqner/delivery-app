@@ -9,17 +9,17 @@ public class Order {
     private Customer customer;
     private LocalDateTime createdAt;
     private Address shippingAddress;
-    private List<Product> products;
+    private List<OrderItem> orderItems;
 
     public Order() {
     }
 
-    public Order(Long id, Customer customer, LocalDateTime createdAt, Address shippingAddress, List<Product> products) {
+    public Order(Long id, Customer customer, LocalDateTime createdAt, Address shippingAddress, List<OrderItem> orderItems) {
         this.id = id;
         this.customer = customer;
         this.createdAt = createdAt;
         this.shippingAddress = shippingAddress;
-        this.products = products;
+        this.orderItems = orderItems;
     }
 
     public Long getId() {
@@ -54,11 +54,11 @@ public class Order {
         this.shippingAddress = shippingAddress;
     }
 
-    public List<Product> getProducts() {
-        return products;
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
     }
 
-    public void setProducts(List<Product> products) {
-        this.products = products;
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
     }
 }

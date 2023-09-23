@@ -1,17 +1,21 @@
 package ru.adel.deliveryapp.models;
 
+import java.util.List;
+
 public class Customer {
     private Long id;
     private String username;
     private String email;
+    private  List<Order> order;
 
     public Customer() {
     }
 
-    public Customer(Long id, String username, String email) {
+    public Customer(Long id, String username, String email, List<Order> order) {
         this.id = id;
         this.username = username;
         this.email = email;
+        this.order = order;
     }
 
     public Long getId() {
@@ -36,5 +40,13 @@ public class Customer {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<Order> getOrder() {
+        return order;
+    }
+
+    public void setOrder(List<Order> order) {
+        this.order = order;
     }
 }
