@@ -1,33 +1,21 @@
-package ru.adel.deliveryapp.models;
+package ru.adel.deliveryapp.dto;
 
 import java.math.BigDecimal;
 
-public class Product {
-    private Long id;
+public class ProductDTO {
     private String name;
     private String description;
     private BigDecimal price;
     private Long stock;
 
-
-    public Product() {
+    public ProductDTO() {
     }
 
-    public Product(Long id, String name, String description, BigDecimal price, Long stock) {
-        this.id = id;
+    public ProductDTO(String name, String description, BigDecimal price, Long stock) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.stock = stock;
-
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -61,6 +49,5 @@ public class Product {
     public void setStock(Long stock) {
         this.stock = stock;
     }
-
 
 }

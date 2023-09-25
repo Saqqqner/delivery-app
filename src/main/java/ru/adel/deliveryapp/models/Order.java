@@ -1,25 +1,26 @@
 package ru.adel.deliveryapp.models;
 
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import java.util.List;
 
 public class Order {
     private Long id;
     private Customer customer;
-    private LocalDateTime createdAt;
     private Address shippingAddress;
     private List<OrderItem> orderItems;
+    private BigDecimal totalPrice;
 
     public Order() {
     }
 
-    public Order(Long id, Customer customer, LocalDateTime createdAt, Address shippingAddress, List<OrderItem> orderItems) {
+    public Order(Long id, Customer customer, Address shippingAddress, List<OrderItem> orderItems) {
         this.id = id;
         this.customer = customer;
-        this.createdAt = createdAt;
+
         this.shippingAddress = shippingAddress;
         this.orderItems = orderItems;
+        this.calculateTotalPrice();
     }
 
     public Long getId() {
@@ -38,14 +39,6 @@ public class Order {
         this.customer = customer;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public Address getShippingAddress() {
         return shippingAddress;
     }
@@ -60,5 +53,19 @@ public class Order {
 
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
+        this.calculateTotalPrice();
     }
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    private void calculateTotalPrice() {
+        BigDecimal total = BigDecimal.ZERO;
+        for (OrderItem item : orderItems) {
+            total = total.add(item.getTotalPrice());
+        }
+        this.totalPrice = total;
+    }
+
 }
