@@ -6,7 +6,7 @@ public class Customer {
     private Long id;
     private String username;
     private String email;
-    private  List<Order> order;
+    private List<Order> order;
 
     public Customer() {
     }
