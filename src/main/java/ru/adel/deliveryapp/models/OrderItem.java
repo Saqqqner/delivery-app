@@ -2,7 +2,7 @@ package ru.adel.deliveryapp.models;
 
 import java.math.BigDecimal;
 
-public class OrderItem {
+public class OrderItem  {
     private Long id;
     private Order order;
     private Product product;

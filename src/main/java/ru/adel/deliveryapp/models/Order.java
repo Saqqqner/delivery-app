@@ -4,7 +4,7 @@ package ru.adel.deliveryapp.models;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class Order {
+public class Order  {
     private Long id;
     private Customer customer;
     private Address shippingAddress;
