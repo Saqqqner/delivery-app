@@ -1,9 +1,10 @@
 package ru.adel.deliveryapp.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class OrderDTO {
+public class OrderDTO implements Serializable {
     private CustomerViewDTO customer;
     private AddressDTO address;
     private List<OrderItemDTO> orderItems;

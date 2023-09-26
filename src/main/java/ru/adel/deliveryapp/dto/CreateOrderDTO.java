@@ -1,8 +1,9 @@
 package ru.adel.deliveryapp.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class CreateOrderDTO {
+public class CreateOrderDTO implements Serializable {
     private Long customerId;
     private AddressDTO address;
     private List<OrderItemDTO> orderItems;

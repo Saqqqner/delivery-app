@@ -5,13 +5,12 @@ import ru.adel.deliveryapp.dao.mapper.impl.CustomerResultSetMapper;
 import ru.adel.deliveryapp.datasourse.jdbc.sessionmanager.SessionManager;
 import ru.adel.deliveryapp.models.Customer;
 
-import java.io.Serializable;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class CustomerDaoImpl implements CustomerDao  {
+public class CustomerDaoImpl implements CustomerDao {
     private final SessionManager sessionManager;
     private final CustomerResultSetMapper customerResultSetMapper;
 
@@ -147,13 +146,13 @@ public class CustomerDaoImpl implements CustomerDao  {
      * SQL queries for customers table.
      */
     enum SQLTask {
-        INSERT_CUSTOMER("INSERT INTO customer (username, email) VALUES (?, ?)"),
-        GET_CUSTOMER_BY_ID("SELECT customer.id, customer.username, customer.email FROM customer WHERE id = ?"),
-        DELETE_CUSTOMER_BY_ID("DELETE FROM customer WHERE id = ?"),
-        UPDATE_CUSTOMER_BY_ID("UPDATE customer SET username = ?, email = ? WHERE id = ?"),
-        GET_ALL_CUSTOMERS("SELECT customer.id, customer.username, customer.email FROM customer"),
-        CHECK_EXISTENCE_BY_EMAIL("SELECT 1 FROM customer WHERE email = ?"),
-        CHECK_EXISTENCE_BY_USERNAME("SELECT 1 FROM customer WHERE username = ?");
+        INSERT_CUSTOMER("INSERT INTO customers (username, email) VALUES (?, ?)"),
+        GET_CUSTOMER_BY_ID("SELECT customers.id, customer.username, customers.email FROM customers WHERE id = ?"),
+        DELETE_CUSTOMER_BY_ID("DELETE FROM customers WHERE id = ?"),
+        UPDATE_CUSTOMER_BY_ID("UPDATE customers SET username = ?, email = ? WHERE id = ?"),
+        GET_ALL_CUSTOMERS("SELECT customers.id, customers.username, customers.email FROM customers"),
+        CHECK_EXISTENCE_BY_EMAIL("SELECT 1 FROM customers WHERE email = ?"),
+        CHECK_EXISTENCE_BY_USERNAME("SELECT 1 FROM customers WHERE username = ?");
 
         String QUERY;
 

@@ -1,8 +1,9 @@
 package ru.adel.deliveryapp.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class CustomerViewDTO {
+public class CustomerViewDTO implements Serializable {
     private String username;
     private String email;
     private List<OrderDTO> orderList;

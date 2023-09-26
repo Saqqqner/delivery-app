@@ -7,7 +7,7 @@ import ru.adel.deliveryapp.dto.CustomerViewDTO;
 import ru.adel.deliveryapp.models.Customer;
 import ru.adel.deliveryapp.service.CustomerService;
 import ru.adel.deliveryapp.util.CustomerNotFoundException;
-import ru.adel.deliveryapp.util.DuplicateCustomerException;
+import ru.adel.deliveryapp.util.DuplicateException;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -58,11 +58,11 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void save(CustomerDTO customerDTO) throws SQLException {
         if (customerDao.existsByEmail(customerDTO.getEmail())) {
-            throw new DuplicateCustomerException(CUSTOMER_DUPLICATE_EMAIL_MSG);
+            throw new DuplicateException(CUSTOMER_DUPLICATE_EMAIL_MSG);
         }
         // Проверка существования пользователя по username
         if (customerDao.existsByUsername(customerDTO.getUsername())) {
-            throw new DuplicateCustomerException(CUSTOMER_DUPLICATE_USERNAME_MSG);
+            throw new DuplicateException(CUSTOMER_DUPLICATE_USERNAME_MSG);
         }
         Customer customer = customerDTOMapper.customerDTOToCustomer(customerDTO);
         customerDao.save(customer);
@@ -73,14 +73,14 @@ public class CustomerServiceImpl implements CustomerService {
         if (!existingUser.getEmail().equals(newEmail)) {
             boolean emailExists = customerDao.existsByEmail(newEmail);
             if (emailExists) {
-                throw new DuplicateCustomerException(CUSTOMER_DUPLICATE_EMAIL_MSG);
+                throw new DuplicateException(CUSTOMER_DUPLICATE_EMAIL_MSG);
             }
             existingUser.setEmail(newEmail);
         }
         if (!existingUser.getUsername().equals(newUsername)) {
             boolean usernameExists = customerDao.existsByUsername(newUsername);
             if (usernameExists) {
-                throw new DuplicateCustomerException(CUSTOMER_DUPLICATE_USERNAME_MSG);
+                throw new DuplicateException(CUSTOMER_DUPLICATE_USERNAME_MSG);
             }
             existingUser.setUsername(newUsername);
         }

@@ -1,6 +1,8 @@
 package ru.adel.deliveryapp.dto;
 
-public class AddressDTO {
+import java.io.Serializable;
+
+public class AddressDTO implements Serializable {
     private String city;
     private String street;
     private String houseNumber;

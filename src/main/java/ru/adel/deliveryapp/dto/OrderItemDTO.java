@@ -1,8 +1,9 @@
 package ru.adel.deliveryapp.dto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class OrderItemDTO {
+public class OrderItemDTO implements Serializable {
     private ProductDTO product;
     private Long quantity;
     private BigDecimal totalPrice;

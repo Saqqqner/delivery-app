@@ -4,7 +4,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class SessionManagerJdbc implements SessionManager {
+public class SessionManagerJdbc implements SessionManager{
 
     private static final int TIMEOUT_IN_SECONDS = 15;
     private final DataSource dataSource;
