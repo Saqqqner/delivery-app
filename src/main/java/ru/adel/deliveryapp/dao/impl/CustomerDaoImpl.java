@@ -3,7 +3,7 @@ package ru.adel.deliveryapp.dao.impl;
 import ru.adel.deliveryapp.dao.CustomerDao;
 import ru.adel.deliveryapp.dao.mapper.impl.CustomerResultSetMapper;
 import ru.adel.deliveryapp.datasourse.jdbc.sessionmanager.SessionManager;
-import ru.adel.deliveryapp.models.Customer;
+import ru.adel.deliveryapp.entity.Customer;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -147,7 +147,7 @@ public class CustomerDaoImpl implements CustomerDao {
      */
     enum SQLTask {
         INSERT_CUSTOMER("INSERT INTO customers (username, email) VALUES (?, ?)"),
-        GET_CUSTOMER_BY_ID("SELECT customers.id, customer.username, customers.email FROM customers WHERE id = ?"),
+        GET_CUSTOMER_BY_ID("SELECT customers.id, customers.username, customers.email FROM customers WHERE id = ?"),
         DELETE_CUSTOMER_BY_ID("DELETE FROM customers WHERE id = ?"),
         UPDATE_CUSTOMER_BY_ID("UPDATE customers SET username = ?, email = ? WHERE id = ?"),
         GET_ALL_CUSTOMERS("SELECT customers.id, customers.username, customers.email FROM customers"),

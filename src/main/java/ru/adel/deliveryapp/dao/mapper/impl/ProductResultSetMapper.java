@@ -1,7 +1,7 @@
 package ru.adel.deliveryapp.dao.mapper.impl;
 
 import ru.adel.deliveryapp.dao.mapper.EntityResultSetMapper;
-import ru.adel.deliveryapp.models.Product;
+import ru.adel.deliveryapp.entity.Product;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

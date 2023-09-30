@@ -3,7 +3,7 @@ package ru.adel.deliveryapp.dao.impl;
 import ru.adel.deliveryapp.dao.ProductDao;
 import ru.adel.deliveryapp.dao.mapper.impl.ProductResultSetMapper;
 import ru.adel.deliveryapp.datasourse.jdbc.sessionmanager.SessionManager;
-import ru.adel.deliveryapp.models.Product;
+import ru.adel.deliveryapp.entity.Product;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -115,6 +115,22 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     @Override
+    public void updateStockById(Long id, Long newStock) throws SQLException {
+        sessionManager.beginSession();
+        try (Connection connection = sessionManager.getCurrentSession();
+             PreparedStatement pst = connection.prepareStatement(SQLTask.UPDATE_STOCK_BY_ID.QUERY)) {
+            pst.setLong(1, newStock);
+            pst.setLong(2, id);
+
+            pst.executeUpdate();
+            sessionManager.commitSession();
+        } catch (SQLException ex) {
+            sessionManager.rollbackSession();
+            throw ex;
+        }
+    }
+
+    @Override
     public boolean existsByName(String name) throws SQLException {
         sessionManager.beginSession();
         try (Connection connection = sessionManager.getCurrentSession();
@@ -135,9 +151,11 @@ public class ProductDaoImpl implements ProductDao {
                 "products.stock FROM products WHERE id = ?"),
         DELETE_PRODUCT_BY_ID("DELETE FROM products WHERE id = ?"),
         UPDATE_PRODUCT_BY_ID("UPDATE products SET name = ?, description = ?,price = ?, stock= ? WHERE id = ?"),
+        UPDATE_STOCK_BY_ID("UPDATE products SET stock = ? WHERE id = ?"),
         GET_ALL_PRODUCTS("SELECT products.id, products.name, products.description,products.price," +
-                "products.stock FROM customer"),
+                "products.stock FROM products"),
         CHECK_EXISTENCE_BY_NAME("SELECT 1 FROM products WHERE name = ?");
+
 
         String QUERY;
 

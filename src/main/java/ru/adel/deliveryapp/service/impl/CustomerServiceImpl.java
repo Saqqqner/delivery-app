@@ -1,70 +1,72 @@
 package ru.adel.deliveryapp.service.impl;
 
 import ru.adel.deliveryapp.dao.CustomerDao;
-import ru.adel.deliveryapp.dao.mapper.CustomerDTOMapper;
-import ru.adel.deliveryapp.dto.CustomerDTO;
-import ru.adel.deliveryapp.dto.CustomerViewDTO;
-import ru.adel.deliveryapp.models.Customer;
+import ru.adel.deliveryapp.dao.OrderDao;
+import ru.adel.deliveryapp.entity.Customer;
+import ru.adel.deliveryapp.entity.Order;
 import ru.adel.deliveryapp.service.CustomerService;
 import ru.adel.deliveryapp.util.CustomerNotFoundException;
 import ru.adel.deliveryapp.util.DuplicateException;
+import ru.adel.deliveryapp.util.OrderNotFoundException;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CustomerServiceImpl implements CustomerService {
     private static final String CUSTOMER_NOT_FOUND_MSG = "Customer not found with ID: ";
     private static final String CUSTOMER_DUPLICATE_EMAIL_MSG = "Customer with the provided email already exists";
     private static final String CUSTOMER_DUPLICATE_USERNAME_MSG = "Customer with the provided username already exists";
     private final CustomerDao customerDao;
-    private final CustomerDTOMapper customerDTOMapper;
+    private final OrderDao orderDao;
 
-    public CustomerServiceImpl(CustomerDao customerDao) {
+
+    public CustomerServiceImpl(CustomerDao customerDao, OrderDao orderDao) {
         this.customerDao = customerDao;
-        customerDTOMapper = CustomerDTOMapper.INSTANCE;
+        this.orderDao = orderDao;
     }
 
     @Override
-    public CustomerViewDTO getCustomerById(Long id) throws SQLException {
-        return customerDao.findById(id)
-                .map(customerDTOMapper::customerToCustomerViewDTO)
+    public Customer getCustomerById(Long id) throws SQLException {
+        Customer customer = customerDao.findById(id)
                 .orElseThrow(() -> new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MSG + id));
+        customer.setOrder(orderDao.findAllByCustomerId(customer.getId()));
+        return customer;
     }
 
     @Override
     public void deleteById(Long id) throws SQLException {
-        customerDao.findById(id)
-                .orElseThrow(() -> new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MSG + id));
-        customerDao.deleteById(id);
+        if (!customerDao.deleteById(id)) {
+            throw new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MSG + id);
+        }
     }
 
     @Override
-    public void update(Long id, CustomerDTO customerDTO) throws SQLException {
+    public void update(Long id, Customer updateCustomer) throws SQLException {
         Customer customer = customerDao.findById(id)
                 .orElseThrow(() -> new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MSG + id));
-        checkAndUpdateEmailAndUsername(customer, customerDTO.getEmail(), customerDTO.getUsername());
+        checkAndUpdateEmailAndUsername(customer, updateCustomer.getEmail(), updateCustomer.getUsername());
         customerDao.update(customer);
     }
 
     @Override
-    public List<CustomerViewDTO> findAll() throws SQLException {
-        return customerDao.findAll()
-                .stream()
-                .map(customerDTOMapper::customerToCustomerViewDTO)
-                .collect(Collectors.toList());
+    public List<Customer> findAll() throws SQLException {
+        List<Customer> customers = customerDao.findAll();
+        for (Customer customer : customers) {
+            List<Order> orders = orderDao.findAllByCustomerId(customer.getId());
+            customer.setOrder(orders);
+        }
+        return customers;
     }
 
     @Override
-    public void save(CustomerDTO customerDTO) throws SQLException {
-        if (customerDao.existsByEmail(customerDTO.getEmail())) {
+    public void save(Customer customer) throws SQLException {
+        if (customerDao.existsByEmail(customer.getEmail())||customerDao.existsByUsername(customer.getUsername())) {
             throw new DuplicateException(CUSTOMER_DUPLICATE_EMAIL_MSG);
         }
         // Проверка существования пользователя по username
-        if (customerDao.existsByUsername(customerDTO.getUsername())) {
+        if (customerDao.existsByUsername(customer.getUsername())) {
             throw new DuplicateException(CUSTOMER_DUPLICATE_USERNAME_MSG);
         }
-        Customer customer = customerDTOMapper.customerDTOToCustomer(customerDTO);
         customerDao.save(customer);
 
     }

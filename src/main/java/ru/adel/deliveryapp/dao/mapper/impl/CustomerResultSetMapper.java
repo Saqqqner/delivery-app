@@ -1,12 +1,13 @@
 package ru.adel.deliveryapp.dao.mapper.impl;
 
 import ru.adel.deliveryapp.dao.mapper.EntityResultSetMapper;
-import ru.adel.deliveryapp.models.Customer;
+import ru.adel.deliveryapp.entity.Customer;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class CustomerResultSetMapper implements EntityResultSetMapper<Customer> {
+public class CustomerResultSetMapper implements EntityResultSetMapper<Customer>  {
     @Override
     public Customer map(ResultSet resultSet)throws SQLException {
         Customer customer = new Customer();

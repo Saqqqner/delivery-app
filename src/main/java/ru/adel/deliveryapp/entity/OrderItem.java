@@ -1,4 +1,4 @@
-package ru.adel.deliveryapp.models;
+package ru.adel.deliveryapp.entity;
 
 import java.math.BigDecimal;
 
@@ -7,7 +7,7 @@ public class OrderItem  {
     private Order order;
     private Product product;
     private Long quantity;
-    private BigDecimal totalPrice;
+    private BigDecimal productTotalPrice;
 
     public OrderItem() {
     }
@@ -17,7 +17,7 @@ public class OrderItem  {
         this.order = order;
         this.product = product;
         this.quantity = quantity;
-        this.totalPrice = totalPrice;
+        this.productTotalPrice = totalPrice;
     }
 
     public Long getId() {
@@ -52,11 +52,15 @@ public class OrderItem  {
         this.quantity = quantity;
     }
 
-    public BigDecimal getTotalPrice() {
-        return totalPrice;
+    public BigDecimal getProductTotalPrice() {
+        return productTotalPrice;
     }
 
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = this.product.getPrice().multiply(BigDecimal.valueOf(this.quantity));
+    public void setProductTotalPrice(BigDecimal productTotalPrice) {
+        this.productTotalPrice = productTotalPrice;
+    }
+
+    public void calculateTotalPrice() {
+        this.productTotalPrice = this.product.getPrice().multiply(BigDecimal.valueOf(this.quantity));
     }
 }

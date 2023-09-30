@@ -20,17 +20,18 @@ CREATE TABLE IF NOT EXISTS Products (
 CREATE TABLE IF NOT EXISTS Orders  (
                                      id SERIAL PRIMARY KEY,
                                      customer_id BIGINT NOT NULL,
-                                     shippingAddress_id BIGINT NOT NULL,
+                                     shipping_address_id BIGINT NOT NULL,
+                                     status VARCHAR(255) NOT NULL,
                                      total_price DECIMAL(10, 2) NOT NULL,
                                      FOREIGN KEY (customer_id) REFERENCES Customers(id),
-    FOREIGN KEY (shippingAddress_id) REFERENCES Address(id)
+    FOREIGN KEY (shipping_address_id) REFERENCES Address(id)
     );
 CREATE TABLE IF NOT EXISTS OrderItems (
                                          id SERIAL PRIMARY KEY,
                                          order_id BIGINT NOT NULL,
                                          product_id BIGINT NOT NULL,
                                          quantity BIGINT NOT NULL,
-                                         total_price DECIMAL(10, 2) NOT NULL,
+                                         product_total_price DECIMAL(10, 2) NOT NULL,
     FOREIGN KEY (order_id) REFERENCES Orders(id),
     FOREIGN KEY (product_id) REFERENCES Products(id)
     );

@@ -1,4 +1,4 @@
-package ru.adel.deliveryapp.dto;
+package ru.adel.deliveryapp.servlet.dto;
 
 import java.io.Serializable;
 import java.util.List;

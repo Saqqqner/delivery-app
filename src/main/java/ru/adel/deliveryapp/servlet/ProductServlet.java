@@ -6,10 +6,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.adel.deliveryapp.dto.ProductByStockDTO;
-import ru.adel.deliveryapp.dto.ProductDTO;
+import ru.adel.deliveryapp.servlet.dto.ProductByStockDTO;
+import ru.adel.deliveryapp.servlet.dto.ProductDTO;
 import ru.adel.deliveryapp.service.ProductService;
 import ru.adel.deliveryapp.service.impl.ProductServiceImpl;
+import ru.adel.deliveryapp.servlet.mapper.ProductMapper;
 import ru.adel.deliveryapp.util.DuplicateException;
 import ru.adel.deliveryapp.util.ProductNotFoundException;
 
@@ -21,14 +22,18 @@ import java.util.List;
 @WebServlet("/products/*")
 public class ProductServlet extends HttpServlet {
     private static final String INTERNAL_MSG = "Internal Server Error";
+    private static final String PRODUCT_ID_IS_REQUIRED_MSG = "Product ID is required";
     private ProductService productService;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private ProductMapper productMapper;
+
 
     @Override
     public void init() throws ServletException {
         final Object productServiceImpl = getServletContext().getAttribute("productService");
 
         this.productService = (ProductServiceImpl) productServiceImpl;
+        this.productMapper = ProductMapper.INSTANCE;
     }
 
     @Override
@@ -51,7 +56,7 @@ public class ProductServlet extends HttpServlet {
             }
             if (id != null) {
                 try {
-                    ProductDTO product = productService.getProductById(id);
+                    ProductDTO product = productMapper.productToProductDTO(productService.getProductById(id));
                     String jsonResponse = objectMapper.writeValueAsString(product);
                     PrintWriter out = resp.getWriter();
                     out.print(jsonResponse);
@@ -61,7 +66,7 @@ public class ProductServlet extends HttpServlet {
                     resp.getWriter().println(e.getMessage());
                 }
             } else {
-                List<ProductDTO> products = productService.findAll();
+                List<ProductDTO> products = productMapper.productsToProductsDTO(productService.findAll());
                 String jsonResponse = objectMapper.writeValueAsString(products);
                 PrintWriter out = resp.getWriter();
                 out.print(jsonResponse);
@@ -80,7 +85,7 @@ public class ProductServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         try {
             ProductByStockDTO productByStockDTO = objectMapper.readValue(request.getInputStream(), ProductByStockDTO.class);
-            productService.save(productByStockDTO);
+            productService.save(productMapper.productByStockDTOToProduct(productByStockDTO));
             response.setStatus(HttpServletResponse.SC_CREATED);
         } catch (DuplicateException e) {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
@@ -101,11 +106,13 @@ public class ProductServlet extends HttpServlet {
                 if (pathParts.length == 2) {
                     Long productId = Long.parseLong(pathParts[1]);
                     ProductByStockDTO productByStockDTO = objectMapper.readValue(req.getInputStream(), ProductByStockDTO.class);
-                    productService.update(productId, productByStockDTO);
+                    productService.update(productId, productMapper.productByStockDTOToProduct(productByStockDTO));
                     resp.setStatus(HttpServletResponse.SC_OK);
                 }
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+                resp.getWriter().println(PRODUCT_ID_IS_REQUIRED_MSG);
             }
         } catch (ProductNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -133,6 +140,7 @@ public class ProductServlet extends HttpServlet {
                 }
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().println(PRODUCT_ID_IS_REQUIRED_MSG);
             }
         } catch (ProductNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);

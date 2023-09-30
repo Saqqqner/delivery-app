@@ -1,17 +1,17 @@
-package ru.adel.deliveryapp.dto;
+package ru.adel.deliveryapp.servlet.dto;
 
 import java.io.Serializable;
 
-public class CustomerDTO implements Serializable {
+public class CreateCustomerDTO implements Serializable {
     private String username;
     private String email;
 
-    public CustomerDTO(String username, String email) {
+    public CreateCustomerDTO(String username, String email) {
         this.username = username;
         this.email = email;
     }
 
-    public CustomerDTO() {
+    public CreateCustomerDTO() {
     }
 
     public String getUsername() {

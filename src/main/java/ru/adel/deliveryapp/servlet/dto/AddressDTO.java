@@ -1,29 +1,21 @@
-package ru.adel.deliveryapp.models;
+package ru.adel.deliveryapp.servlet.dto;
 
-public class Address {
-    private Long id;
+import java.io.Serializable;
+
+public class AddressDTO implements Serializable {
     private String city;
     private String street;
     private String houseNumber;
     private String apartmentNumber;
 
-    public Address() {
+    public AddressDTO() {
     }
 
-    public Address(Long id, String city, String street, String houseNumber, String apartmentNumber) {
-        this.id = id;
+    public AddressDTO(String city, String street, String houseNumber, String apartmentNumber) {
         this.city = city;
         this.street = street;
         this.houseNumber = houseNumber;
         this.apartmentNumber = apartmentNumber;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getCity() {

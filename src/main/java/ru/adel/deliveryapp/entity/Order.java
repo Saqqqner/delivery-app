@@ -1,4 +1,4 @@
-package ru.adel.deliveryapp.models;
+package ru.adel.deliveryapp.entity;
 
 
 import java.math.BigDecimal;
@@ -9,17 +9,18 @@ public class Order  {
     private Customer customer;
     private Address shippingAddress;
     private List<OrderItem> orderItems;
+    private String status;
     private BigDecimal totalPrice;
 
     public Order() {
     }
 
-    public Order(Long id, Customer customer, Address shippingAddress, List<OrderItem> orderItems) {
+    public Order(Long id, Customer customer, Address shippingAddress, List<OrderItem> orderItems, String status) {
         this.id = id;
         this.customer = customer;
-
         this.shippingAddress = shippingAddress;
         this.orderItems = orderItems;
+        this.status = status;
         this.calculateTotalPrice();
     }
 
@@ -60,12 +61,24 @@ public class Order  {
         return totalPrice;
     }
 
+
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
     private void calculateTotalPrice() {
         BigDecimal total = BigDecimal.ZERO;
         for (OrderItem item : orderItems) {
-            total = total.add(item.getTotalPrice());
+            total = total.add(item.getProductTotalPrice());
         }
         this.totalPrice = total;
     }
-
 }

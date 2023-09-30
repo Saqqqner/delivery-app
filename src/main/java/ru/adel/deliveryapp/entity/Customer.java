@@ -1,4 +1,4 @@
-package ru.adel.deliveryapp.models;
+package ru.adel.deliveryapp.entity;
 
 import java.util.List;
 

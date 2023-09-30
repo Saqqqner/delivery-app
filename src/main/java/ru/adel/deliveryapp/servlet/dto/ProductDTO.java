@@ -1,28 +1,23 @@
-package ru.adel.deliveryapp.dto;
+package ru.adel.deliveryapp.servlet.dto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class ProductByStockDTO implements Serializable {
+public class ProductDTO implements Serializable {
     private String name;
     private String description;
     private BigDecimal price;
-    private Long stock;
 
 
-    public ProductByStockDTO() {
+    public ProductDTO() {
     }
 
-    public ProductByStockDTO( String name, String description, BigDecimal price, Long stock) {
-
+    public ProductDTO(String name, String description, BigDecimal price) {
         this.name = name;
         this.description = description;
         this.price = price;
-        this.stock = stock;
 
     }
-
-
 
     public String getName() {
         return name;
@@ -48,14 +43,6 @@ public class ProductByStockDTO implements Serializable {
         this.price = price;
     }
 
-    public Long getStock() {
-        return stock;
-    }
-
-    public void setStock(Long stock) {
-        this.stock = stock;
-    }
 
 
 }
-

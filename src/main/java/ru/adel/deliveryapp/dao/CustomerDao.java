@@ -1,6 +1,6 @@
 package ru.adel.deliveryapp.dao;
 
-import ru.adel.deliveryapp.models.Customer;
+import ru.adel.deliveryapp.entity.Customer;
 
 import java.io.Serializable;
 import java.sql.SQLException;

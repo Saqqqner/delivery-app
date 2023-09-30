@@ -6,11 +6,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.adel.deliveryapp.servlet.dto.CreateCustomerDTO;
-import ru.adel.deliveryapp.servlet.mapper.CustomerMapper;
-import ru.adel.deliveryapp.servlet.dto.CustomerViewDTO;
-import ru.adel.deliveryapp.service.CustomerService;
-import ru.adel.deliveryapp.service.impl.CustomerServiceImpl;
+import ru.adel.deliveryapp.servlet.mapper.AddressMapper;
+import ru.adel.deliveryapp.servlet.dto.AddressDTO;
+import ru.adel.deliveryapp.service.AddressService;
+import ru.adel.deliveryapp.service.impl.AddressServiceImpl;
 import ru.adel.deliveryapp.util.CustomerNotFoundException;
 import ru.adel.deliveryapp.util.DuplicateException;
 
@@ -19,18 +18,18 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet("/customers/*")
-public class CustomerServlet extends HttpServlet {
-    private  static final String INTERNAL_MSG ="Internal Server Error";
+@WebServlet("/address/*")
+public class AddressServlet extends HttpServlet {
+    private static final String INTERNAL_MSG = "Internal Server Error";
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private CustomerService customerService;
-    private CustomerMapper customerMapper;
+    private AddressService addressService;
+    private AddressMapper addressMapper;
 
     @Override
     public void init() throws ServletException {
-        final Object customerServiceImpl = getServletContext().getAttribute("customerService");
-        this.customerMapper = CustomerMapper.INSTANCE;
-        this.customerService = (CustomerServiceImpl) customerServiceImpl;
+        final Object addressServiceImpl = getServletContext().getAttribute("addressService");
+        this.addressMapper = AddressMapper.INSTANCE;
+        this.addressService = (AddressServiceImpl) addressServiceImpl;
     }
 
     @Override
@@ -52,8 +51,8 @@ public class CustomerServlet extends HttpServlet {
             }
             if (id != null) {
                 try {
-                    CustomerViewDTO customer = customerMapper.customerToCustomerViewDTO(customerService.getCustomerById(id));
-                    String jsonResponse = objectMapper.writeValueAsString(customer);
+                    AddressDTO addressDTO = addressMapper.addressToAddressDTO(addressService.getAddressById(id));
+                    String jsonResponse = objectMapper.writeValueAsString(addressDTO);
                     PrintWriter out = resp.getWriter();
                     out.print(jsonResponse);
                     out.flush();
@@ -62,8 +61,8 @@ public class CustomerServlet extends HttpServlet {
                     resp.getWriter().println(e.getMessage());
                 }
             } else {
-                List<CustomerViewDTO> customers = customerMapper.customersToCustomersViewDTO(customerService.findAll());
-                String jsonResponse = objectMapper.writeValueAsString(customers);
+                List<AddressDTO> addressDTOS = addressMapper.addressListTOAddressDTOList(addressService.findAll());
+                String jsonResponse = objectMapper.writeValueAsString(addressDTOS);
                 PrintWriter out = resp.getWriter();
                 out.print(jsonResponse);
                 out.flush();
@@ -81,13 +80,18 @@ public class CustomerServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try {
-            CreateCustomerDTO newCustomerDTO = objectMapper.readValue(request.getInputStream(), CreateCustomerDTO.class);
-            customerService.save(customerMapper.customerDTOToCustomer(newCustomerDTO));
+            // Извлечение данных нового пользователя из тела POST-запроса
+            AddressDTO addressDTO = objectMapper.readValue(request.getInputStream(), AddressDTO.class);
+            // Создание нового пользователя
+            addressService.save(addressMapper.addressDTOToAddress(addressDTO));
+            // Отправка ответа с кодом 201 Created
             response.setStatus(HttpServletResponse.SC_CREATED);
         } catch (DuplicateException e) {
+            // Если пользователь с такими данными уже существует, отправляем код 409 Conflict
             response.setStatus(HttpServletResponse.SC_CONFLICT);
             response.getWriter().println(e.getMessage());
         } catch (IOException | SQLException e) {
+            // Обработка других ошибок, возникших при сохранении пользователя
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println(INTERNAL_MSG);
             e.printStackTrace();
@@ -101,14 +105,13 @@ public class CustomerServlet extends HttpServlet {
             if (pathInfo != null && !pathInfo.equals("/")) {
                 String[] pathParts = pathInfo.split("/");
                 if (pathParts.length == 2) {
-                    Long customerId = Long.parseLong(pathParts[1]);
-                    CreateCustomerDTO updatedCustomer = objectMapper.readValue(req.getInputStream(), CreateCustomerDTO.class);
-                    customerService.update(customerId, customerMapper.customerDTOToCustomer(updatedCustomer));
+                    Long addressId = Long.parseLong(pathParts[1]);
+                    AddressDTO addressDTO = objectMapper.readValue(req.getInputStream(), AddressDTO.class);
+                    addressService.update(addressId, addressMapper.addressDTOToAddress(addressDTO));
                     resp.setStatus(HttpServletResponse.SC_OK);
                 }
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().println("Customer ID is required");
             }
         } catch (CustomerNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -132,7 +135,7 @@ public class CustomerServlet extends HttpServlet {
                 String[] pathParts = pathInfo.split("/");
                 if (pathParts.length == 2) {
                     Long customerId = Long.parseLong(pathParts[1]);
-                    customerService.deleteById(customerId);
+                    addressService.deleteById(customerId);
                     resp.setStatus(HttpServletResponse.SC_OK);
                 }
             } else {

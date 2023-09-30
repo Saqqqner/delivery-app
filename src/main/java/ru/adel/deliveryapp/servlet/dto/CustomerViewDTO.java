@@ -1,4 +1,4 @@
-package ru.adel.deliveryapp.dto;
+package ru.adel.deliveryapp.servlet.dto;
 
 import java.io.Serializable;
 import java.util.List;
@@ -6,15 +6,15 @@ import java.util.List;
 public class CustomerViewDTO implements Serializable {
     private String username;
     private String email;
-    private List<OrderDTO> orderList;
+    private List<OrderViewDTO> order;
 
     public CustomerViewDTO() {
     }
 
-    public CustomerViewDTO(String username, String email, List<OrderDTO> orderList) {
+    public CustomerViewDTO(String username, String email, List<OrderViewDTO> order) {
         this.username = username;
         this.email = email;
-        this.orderList = orderList;
+        this.order = order;
     }
 
     public String getUsername() {
@@ -33,11 +33,11 @@ public class CustomerViewDTO implements Serializable {
         this.email = email;
     }
 
-    public List<OrderDTO> getOrderList() {
-        return orderList;
+    public List<OrderViewDTO> getOrder() {
+        return order;
     }
 
-    public void setOrderList(List<OrderDTO> orderList) {
-        this.orderList = orderList;
+    public void setOrder(List<OrderViewDTO> order) {
+        this.order = order;
     }
 }
