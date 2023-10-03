@@ -42,16 +42,21 @@ public class ProductDaoImpl implements ProductDao {
     public boolean deleteById(Long id) throws SQLException {
         int updatedRows;
         sessionManager.beginSession();
-        try (Connection connection = sessionManager.getCurrentSession();
-             PreparedStatement pst = connection.prepareStatement(SQLTask.DELETE_PRODUCT_BY_ID.QUERY)) {
-            pst.setLong(1, id);
-            updatedRows = pst.executeUpdate();
-            sessionManager.commitSession();
-        } catch (SQLException ex) {
-            sessionManager.rollbackSession();
-            throw ex;
+        try (Connection connection = sessionManager.getCurrentSession()) {
+            // Check if the product with the given id exists
+            if (id<0) {
+                throw new SQLException("ID can't be negative");
+            }
+            try (PreparedStatement pst = connection.prepareStatement(SQLTask.DELETE_PRODUCT_BY_ID.QUERY)) {
+                pst.setLong(1, id);
+                updatedRows = pst.executeUpdate();
+                sessionManager.commitSession();
+            } catch (SQLException ex) {
+                sessionManager.rollbackSession();
+                throw ex;
+            }
+            return updatedRows > 0;
         }
-        return updatedRows > 0;
     }
 
     @Override
@@ -117,18 +122,24 @@ public class ProductDaoImpl implements ProductDao {
     @Override
     public void updateStockById(Long id, Long newStock) throws SQLException {
         sessionManager.beginSession();
-        try (Connection connection = sessionManager.getCurrentSession();
-             PreparedStatement pst = connection.prepareStatement(SQLTask.UPDATE_STOCK_BY_ID.QUERY)) {
-            pst.setLong(1, newStock);
-            pst.setLong(2, id);
+        try (Connection connection = sessionManager.getCurrentSession()) {
+            if (id<0) {
+                throw new SQLException("ID can't be negative");
+            }
+            try (PreparedStatement pst = connection.prepareStatement(SQLTask.UPDATE_STOCK_BY_ID.QUERY)) {
+                pst.setLong(1, newStock);
+                pst.setLong(2, id);
 
-            pst.executeUpdate();
-            sessionManager.commitSession();
-        } catch (SQLException ex) {
-            sessionManager.rollbackSession();
-            throw ex;
+                pst.executeUpdate();
+                sessionManager.commitSession();
+            } catch (SQLException ex) {
+                sessionManager.rollbackSession();
+                throw ex;
+            }
         }
     }
+
+
 
     @Override
     public boolean existsByName(String name) throws SQLException {
@@ -146,6 +157,7 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     enum SQLTask {
+
         INSERT_PRODUCT("INSERT INTO products (name, description,price,stock) VALUES (?, ?, ?, ?)"),
         GET_PRODUCT_BY_ID("SELECT products.id, products.name, products.description,products.price," +
                 "products.stock FROM products WHERE id = ?"),

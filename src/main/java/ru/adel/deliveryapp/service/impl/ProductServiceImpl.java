@@ -5,7 +5,6 @@ import ru.adel.deliveryapp.entity.OrderItem;
 import ru.adel.deliveryapp.entity.Product;
 import ru.adel.deliveryapp.service.ProductService;
 import ru.adel.deliveryapp.util.DuplicateException;
-import ru.adel.deliveryapp.util.OrderNotFoundException;
 import ru.adel.deliveryapp.util.ProductNotFoundException;
 
 import java.sql.SQLException;
@@ -33,7 +32,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteById(Long id) throws SQLException {
         if (!productDao.deleteById(id)) {
-            throw new OrderNotFoundException(PRODUCT_NOT_FOUND_MSG + id);
+            throw new ProductNotFoundException(PRODUCT_NOT_FOUND_MSG + id);
 
         }
     }

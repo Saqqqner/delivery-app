@@ -49,9 +49,8 @@ public class ContextListener implements ServletContextListener {
         this.orderItemDao = new OrderItemDaoImpl(sessionManager);
         this.addressService = new AddressServiceImpl(addressDao);
         this.productService = new ProductServiceImpl(productDao);
-        this.customerService = new CustomerServiceImpl(customerDao, orderDao);
-        this.orderService = new OrderServiceImpl(orderDao, productService, customerService, addressService, orderItemDao);
-
+        this.orderService = new OrderServiceImpl(orderDao, productService, customerDao, addressService, orderItemDao);
+        this.customerService = new CustomerServiceImpl(customerDao, orderService);
 
         servletContext.setAttribute("orderService", orderService);
         servletContext.setAttribute("addressService", addressService);

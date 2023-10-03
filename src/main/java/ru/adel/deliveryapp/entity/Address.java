@@ -1,5 +1,7 @@
 package ru.adel.deliveryapp.entity;
 
+import java.util.Objects;
+
 public class Address {
     private Long id;
     private String city;
@@ -56,5 +58,32 @@ public class Address {
 
     public void setApartmentNumber(String apartmentNumber) {
         this.apartmentNumber = apartmentNumber;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Address address = (Address) o;
+        return Objects.equals(id, address.id) &&
+                Objects.equals(city, address.city) &&
+                Objects.equals(street, address.street) &&
+                Objects.equals(houseNumber, address.houseNumber) &&
+                Objects.equals(apartmentNumber, address.apartmentNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, city, street, houseNumber, apartmentNumber);
+    }
+
+    @Override
+    public String toString() {
+        return "Address{" +
+                "id=" + id +
+                ", city='" + city + '\'' +
+                ", street='" + street + '\'' +
+                ", houseNumber='" + houseNumber + '\'' +
+                ", apartmentNumber='" + apartmentNumber + '\'' +
+                '}';
     }
 }

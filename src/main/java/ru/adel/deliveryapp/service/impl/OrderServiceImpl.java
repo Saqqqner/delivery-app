@@ -1,11 +1,11 @@
 package ru.adel.deliveryapp.service.impl;
 
 
+import ru.adel.deliveryapp.dao.CustomerDao;
 import ru.adel.deliveryapp.dao.OrderDao;
 import ru.adel.deliveryapp.dao.OrderItemDao;
 import ru.adel.deliveryapp.entity.*;
 import ru.adel.deliveryapp.service.AddressService;
-import ru.adel.deliveryapp.service.CustomerService;
 import ru.adel.deliveryapp.service.OrderService;
 import ru.adel.deliveryapp.service.ProductService;
 import ru.adel.deliveryapp.servlet.dto.OrderDTO;
@@ -22,14 +22,14 @@ public class OrderServiceImpl implements OrderService {
     private static final String ORDER_NOT_FOUND_MSG = "Order not found with ID: ";
     private final OrderDao orderDao;
     private final ProductService productService;
-    private final CustomerService customerService;
+    private final CustomerDao customerDao;
     private final AddressService addressService;
     private final OrderItemDao orderItemDao;
 
-    public OrderServiceImpl(OrderDao orderDao, ProductService productService, CustomerService customerService, AddressService addressService, OrderItemDao orderItemDao) {
+    public OrderServiceImpl(OrderDao orderDao, ProductService productService, CustomerDao customerDao, AddressService addressService, OrderItemDao orderItemDao) {
         this.orderDao = orderDao;
         this.productService = productService;
-        this.customerService = customerService;
+        this.customerDao = customerDao;
         this.addressService = addressService;
         this.orderItemDao = orderItemDao;
     }
@@ -61,7 +61,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public Long createOrder(OrderDTO orderDTO) throws SQLException, CustomerNotFoundException, AddressNotFoundException {
-        Customer customer = customerService.getCustomerById(orderDTO.getCustomerId());
+        Customer customer = customerDao.findById(orderDTO.getCustomerId())
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with ID: "));
         Address address = addressService.getAddressById(orderDTO.getAddressId());
         Order order = new Order();
         order.setShippingAddress(address);
@@ -107,6 +108,6 @@ public class OrderServiceImpl implements OrderService {
         if (!orderDao.deleteById(id)) {
             throw new OrderNotFoundException(ORDER_NOT_FOUND_MSG + id);
         }
-        orderItemDao.deleteByOrderId(id);
+        orderItemDao.deleteAllByOrderId(id);
     }
 }

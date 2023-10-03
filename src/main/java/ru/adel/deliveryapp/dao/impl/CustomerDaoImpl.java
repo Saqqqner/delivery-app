@@ -43,16 +43,20 @@ public class CustomerDaoImpl implements CustomerDao {
     public boolean deleteById(Long id) throws SQLException {
         int updatedRows;
         sessionManager.beginSession();
-        try (Connection connection = sessionManager.getCurrentSession();
-             PreparedStatement pst = connection.prepareStatement(SQLTask.DELETE_CUSTOMER_BY_ID.QUERY)) {
-            pst.setLong(1, id);
-            updatedRows = pst.executeUpdate();
-            sessionManager.commitSession();
-        } catch (SQLException ex) {
-            sessionManager.rollbackSession();
-            throw ex;
+        try (Connection connection = sessionManager.getCurrentSession()) {
+            if (id < 0) {
+                throw new SQLException("ID can't be negative");
+            }
+            try (PreparedStatement pst = connection.prepareStatement(SQLTask.DELETE_CUSTOMER_BY_ID.QUERY)) {
+                pst.setLong(1, id);
+                updatedRows = pst.executeUpdate();
+                sessionManager.commitSession();
+            } catch (SQLException ex) {
+                sessionManager.rollbackSession();
+                throw ex;
+            }
+            return updatedRows > 0;
         }
-        return updatedRows > 0;
     }
 
     @Override
@@ -80,7 +84,6 @@ public class CustomerDaoImpl implements CustomerDao {
              PreparedStatement pst = connection.prepareStatement(SQLTask.INSERT_CUSTOMER.QUERY, Statement.RETURN_GENERATED_KEYS)) {
             pst.setString(1, customer.getUsername());
             pst.setString(2, customer.getEmail());
-
             pst.executeUpdate();
             try (ResultSet rs = pst.getGeneratedKeys()) {
                 rs.next();
@@ -102,7 +105,6 @@ public class CustomerDaoImpl implements CustomerDao {
             pst.setString(1, customer.getUsername());
             pst.setString(2, customer.getEmail());
             pst.setLong(3, customer.getId());
-
             pst.executeUpdate();
             sessionManager.commitSession();
         } catch (SQLException ex) {

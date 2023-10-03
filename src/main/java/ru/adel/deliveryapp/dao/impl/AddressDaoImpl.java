@@ -42,16 +42,20 @@ public class AddressDaoImpl implements AddressDao {
     public boolean deleteById(Long id) throws SQLException {
         int updatedRows;
         sessionManager.beginSession();
-        try (Connection connection = sessionManager.getCurrentSession();
-             PreparedStatement pst = connection.prepareStatement(SQLTask.DELETE_ADDRESS_BY_ID.QUERY)) {
-            pst.setLong(1, id);
-            updatedRows = pst.executeUpdate();
-            sessionManager.commitSession();
-        } catch (SQLException ex) {
-            sessionManager.rollbackSession();
-            throw ex;
+        try (Connection connection = sessionManager.getCurrentSession()) {
+            if (id < 0) {
+                throw new SQLException("ID can't be negative");
+            }
+            try (PreparedStatement pst = connection.prepareStatement(SQLTask.DELETE_ADDRESS_BY_ID.QUERY)) {
+                pst.setLong(1, id);
+                updatedRows = pst.executeUpdate();
+                sessionManager.commitSession();
+            } catch (SQLException ex) {
+                sessionManager.rollbackSession();
+                throw ex;
+            }
+            return updatedRows > 0;
         }
-        return updatedRows > 0;
     }
 
 

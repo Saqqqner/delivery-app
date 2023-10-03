@@ -4,7 +4,6 @@ import ru.adel.deliveryapp.dao.AddressDao;
 import ru.adel.deliveryapp.entity.Address;
 import ru.adel.deliveryapp.service.AddressService;
 import ru.adel.deliveryapp.util.AddressNotFoundException;
-import ru.adel.deliveryapp.util.OrderNotFoundException;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -28,7 +27,7 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public void deleteById(Long id) throws SQLException {
         if (!addressDao.deleteById(id)) {
-            throw new OrderNotFoundException(ADDRESS_NOT_FOUND_MSG + id);
+            throw new AddressNotFoundException(ADDRESS_NOT_FOUND_MSG + id);
         }
     }
 

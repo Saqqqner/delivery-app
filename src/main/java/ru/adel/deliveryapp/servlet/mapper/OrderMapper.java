@@ -15,19 +15,16 @@ public interface OrderMapper {
     OrderMapper INSTANCE = Mappers.getMapper(OrderMapper.class);
 
 
-    // Остальные маппинги остаются неизменными
-
     @Mapping(source = "customer.id", target = "customerId")
     @Mapping(source = "shippingAddress.id", target = "addressId")
     @Mapping(source = "orderItems", target = "orderItems")
-        // Маппируем поле orderItems напрямую, так как типы совпадают
+
     OrderViewDTO orderToOrderViewDTO(Order order);
 
 
     @Mapping(source = "customer.id", target = "customerId")
     @Mapping(source = "shippingAddress.id", target = "addressId")
     @Mapping(source = "orderItems", target = "orderItems")
-        // Маппируем поле orderItems напрямую, так как типы совпадают
     List<OrderViewDTO> orderListToOrderDTOList(List<Order> orders);
 
 

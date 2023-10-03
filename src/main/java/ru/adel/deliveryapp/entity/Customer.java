@@ -1,6 +1,7 @@
 package ru.adel.deliveryapp.entity;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Customer {
     private Long id;
@@ -48,5 +49,28 @@ public class Customer {
 
     public void setOrder(List<Order> order) {
         this.order = order;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Customer customer = (Customer) o;
+        return Objects.equals(id, customer.id) && Objects.equals(username, customer.username) && Objects.equals(email, customer.email) && Objects.equals(order, customer.order);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, email, order);
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", order=" + order +
+                '}';
     }
 }

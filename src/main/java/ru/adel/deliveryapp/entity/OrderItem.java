@@ -1,6 +1,7 @@
 package ru.adel.deliveryapp.entity;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class OrderItem  {
     private Long id;
@@ -62,5 +63,29 @@ public class OrderItem  {
 
     public void calculateTotalPrice() {
         this.productTotalPrice = this.product.getPrice().multiply(BigDecimal.valueOf(this.quantity));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OrderItem orderItem = (OrderItem) o;
+        return Objects.equals(id, orderItem.id) && Objects.equals(order, orderItem.order) && Objects.equals(product, orderItem.product) && Objects.equals(quantity, orderItem.quantity) && Objects.equals(productTotalPrice, orderItem.productTotalPrice);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, order, product, quantity, productTotalPrice);
+    }
+
+    @Override
+    public String toString() {
+        return "OrderItem{" +
+                "id=" + id +
+                ", order=" + order +
+                ", product=" + product +
+                ", quantity=" + quantity +
+                ", productTotalPrice=" + productTotalPrice +
+                '}';
     }
 }

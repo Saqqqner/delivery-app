@@ -20,7 +20,6 @@ public interface CustomerMapper extends Serializable {
     @Mapping(source = "order", target = "order")
     List<CustomerViewDTO> customersToCustomersViewDTO(List<Customer> customers);
 
-    CreateCustomerDTO customerToCustomerDTO(Customer customer);
 
     Customer customerDTOToCustomer(CreateCustomerDTO customerDTO);
 }

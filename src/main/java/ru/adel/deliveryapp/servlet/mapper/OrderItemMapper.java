@@ -16,15 +16,8 @@ public interface OrderItemMapper {
     @Mapping(target = "productId", source = "product.id")
     OrderItemDTO orderItemToOrderItemDTO(OrderItem orderItem);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "order", ignore = true)
-    OrderItem orderItemDTOToOrderItem(OrderItemDTO orderItemDTO);
     @Mapping(target = "productId", source = "product.id")
     OrderItemViewDTO orderItemToOrderItemViewDTO(OrderItem orderItem);
-
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "order", ignore = true)
-    OrderItem orderItemDTOToOrderItem(OrderItemViewDTO orderItemDTO);
 
     @Mapping(target = "productId", source = "product.id")
     void updateOrderItemFromProduct(Product product, @MappingTarget OrderItemDTO orderItemDTO);
