@@ -111,6 +111,9 @@ public class OrderServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().println(ORDER_ID_REQUIRED_MSG);
             }
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().println(INVALID_ID_MSG);
         } catch (OrderNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().println(e.getMessage());
@@ -120,8 +123,8 @@ public class OrderServlet extends HttpServlet {
         } catch (IOException | SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
-
         }
+
 
     }
 
@@ -140,6 +143,9 @@ public class OrderServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().println(ORDER_ID_REQUIRED_MSG);
             }
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().println(INVALID_ID_MSG);
         } catch (OrderNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().println(e.getMessage());

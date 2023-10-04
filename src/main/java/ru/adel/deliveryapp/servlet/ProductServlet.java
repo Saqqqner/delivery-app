@@ -6,10 +6,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.adel.deliveryapp.servlet.dto.ProductByStockDTO;
-import ru.adel.deliveryapp.servlet.dto.ProductDTO;
 import ru.adel.deliveryapp.service.ProductService;
 import ru.adel.deliveryapp.service.impl.ProductServiceImpl;
+import ru.adel.deliveryapp.servlet.dto.ProductByStockDTO;
+import ru.adel.deliveryapp.servlet.dto.ProductDTO;
 import ru.adel.deliveryapp.servlet.mapper.ProductMapper;
 import ru.adel.deliveryapp.util.DuplicateException;
 import ru.adel.deliveryapp.util.ProductNotFoundException;
@@ -23,6 +23,7 @@ import java.util.List;
 public class ProductServlet extends HttpServlet {
     private static final String INTERNAL_MSG = "Internal Server Error";
     private static final String PRODUCT_ID_IS_REQUIRED_MSG = "Product ID is required";
+    private static final String INVALID_ID_MSG = "Invalid ID parameter";
     private ProductService productService;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private ProductMapper productMapper;
@@ -47,7 +48,6 @@ public class ProductServlet extends HttpServlet {
                 try {
                     id = Long.parseLong(parts[2]);
                 } catch (NumberFormatException e) {
-                    // Обработка ошибки, если "id" не является числом
                     resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     resp.getWriter().println("Invalid ID parameter");
                     return;
@@ -71,7 +71,7 @@ public class ProductServlet extends HttpServlet {
                 out.print(jsonResponse);
                 out.flush();
             }
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
         }
@@ -109,6 +109,9 @@ public class ProductServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().println(PRODUCT_ID_IS_REQUIRED_MSG);
             }
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().println(INVALID_ID_MSG);
         } catch (ProductNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().println(e.getMessage());
@@ -136,6 +139,9 @@ public class ProductServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().println(PRODUCT_ID_IS_REQUIRED_MSG);
             }
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().println(INVALID_ID_MSG);
         } catch (ProductNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().println(e.getMessage());
@@ -144,6 +150,7 @@ public class ProductServlet extends HttpServlet {
             resp.getWriter().println(INTERNAL_MSG);
         }
     }
+
     private void respConfig(HttpServletResponse resp) {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");

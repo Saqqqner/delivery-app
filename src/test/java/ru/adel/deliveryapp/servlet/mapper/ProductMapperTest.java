@@ -12,8 +12,6 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 class ProductMapperTest {
 
     private ProductMapper productMapper;
@@ -56,10 +54,10 @@ class ProductMapperTest {
 
         // Assert
         Assertions.assertEquals(productList.size(), productsByStockDTOList.size());
-        Assertions.assertEquals(productList.get(0).getStock(),productsByStockDTOList.get(0).getStock());
-        Assertions.assertEquals(productList.get(1).getStock(),productsByStockDTOList.get(1).getStock());
-        Assertions.assertEquals(productList.get(0).getPrice(),productsByStockDTOList.get(0).getPrice());
-        Assertions.assertEquals(productList.get(1).getPrice(),productsByStockDTOList.get(1).getPrice());
+        Assertions.assertEquals(productList.get(0).getStock(), productsByStockDTOList.get(0).getStock());
+        Assertions.assertEquals(productList.get(1).getStock(), productsByStockDTOList.get(1).getStock());
+        Assertions.assertEquals(productList.get(0).getPrice(), productsByStockDTOList.get(0).getPrice());
+        Assertions.assertEquals(productList.get(1).getPrice(), productsByStockDTOList.get(1).getPrice());
     }
 
     @Test
@@ -72,8 +70,8 @@ class ProductMapperTest {
 
 
         Assertions.assertEquals(productList.size(), productsDTOList.size());
-        Assertions.assertEquals(productList.get(0).getPrice(),productsDTOList.get(0).getPrice());
-        Assertions.assertEquals(productList.get(1).getPrice(),productsDTOList.get(1).getPrice());
+        Assertions.assertEquals(productList.get(0).getPrice(), productsDTOList.get(0).getPrice());
+        Assertions.assertEquals(productList.get(1).getPrice(), productsDTOList.get(1).getPrice());
 
     }
 

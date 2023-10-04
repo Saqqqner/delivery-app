@@ -56,18 +56,13 @@ class OrderServletTest {
 
     @Test
     void testDoGetWithValidId() throws Exception {
-        // Arrange
         Long orderId = 1L;
         OrderViewDTO orderViewDTO = new OrderViewDTO();
         Mockito.when(request.getRequestURI()).thenReturn("/orders/" + orderId);
-        Mockito.when(orderService.getOrderById(orderId)).thenReturn(new Order()); // You should mock the actual return object
+        Mockito.when(orderService.getOrderById(orderId)).thenReturn(new Order());
         Mockito.when(orderMapper.orderToOrderViewDTO(Mockito.any())).thenReturn(orderViewDTO);
         Mockito.when(response.getWriter()).thenReturn(printWriter);
-
-        // Act
         orderServlet.doGet(request, response);
-
-        // Assert
         Mockito.verify(response).setContentType("application/json");
         Mockito.verify(response).setCharacterEncoding("UTF-8");
         Mockito.verify(response, Mockito.never()).setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -78,21 +73,15 @@ class OrderServletTest {
 
     @Test
     void testDoGetWithInvalidId() throws Exception {
-        // Arrange
         Mockito.when(request.getRequestURI()).thenReturn("/orders/invalidId");
         Mockito.when(response.getWriter()).thenReturn(printWriter);
-
-        // Act
         orderServlet.doGet(request, response);
-
-        // Assert
         Mockito.verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
         Mockito.verify(response.getWriter()).println("Invalid ID parameter");
     }
 
     @Test
     void testDoGetAllOrders() throws Exception {
-        // Arrange
         Mockito.when(request.getRequestURI()).thenReturn("/orders");
         List<Order> orders = Arrays.asList(
                 new Order(1L, null, null, new ArrayList<>(), "S"),
@@ -105,11 +94,7 @@ class OrderServletTest {
         Mockito.when(orderService.getAllOrders()).thenReturn(orders);
         Mockito.when(orderMapper.orderListToOrderDTOList(orders)).thenReturn(orderViewDTOS);
         Mockito.when(response.getWriter()).thenReturn(printWriter);
-
-        // Act
         orderServlet.doGet(request, response);
-
-        // Assert
         Mockito.verify(response).setContentType("application/json");
         Mockito.verify(response).setCharacterEncoding("UTF-8");
         Mockito.verify(response, Mockito.never()).setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -119,14 +104,9 @@ class OrderServletTest {
 
     @Test
     void testDoPost() throws Exception {
-        // Arrange
         OrderDTO orderDTO = new OrderDTO();
         Mockito.when(request.getInputStream()).thenReturn(getInputStream(orderDTO));
-
-        // Act
         orderServlet.doPost(request, response);
-
-        // Assert
         Mockito.verify(response).setContentType("application/json");
         Mockito.verify(response).setCharacterEncoding("UTF-8");
         Mockito.verify(response, Mockito.never()).setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -135,54 +115,36 @@ class OrderServletTest {
 
     @Test
     void testDoPutWithValidId() throws Exception {
-        // Arrange
         Long orderId = 1L;
         Mockito.lenient().when(response.getWriter()).thenReturn(printWriter);
         Mockito.when(request.getPathInfo()).thenReturn("/" + orderId);
-        // Act
         orderServlet.doPut(request, response);
-
-        // Assert
         verify(orderService).updateOrderStatusDelivered(orderId);
         verify(response).setStatus(HttpServletResponse.SC_OK);
     }
 
     @Test
     void testDoPutWithInvalidId() throws Exception {
-        // Arrange
         Mockito.when(request.getPathInfo()).thenReturn("/");
         Mockito.when(response.getWriter()).thenReturn(printWriter);
-        // Act
         orderServlet.doPut(request, response);
-
-        // Assert
         Mockito.verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
         Mockito.verify(response.getWriter()).println("Order ID is required");
     }
 
     @Test
     void testDoDeleteWithValidId() throws Exception {
-        // Arrange
         Long orderId = 1L;
         Mockito.when(request.getPathInfo()).thenReturn("/" + orderId);
-
-        // Act
         orderServlet.doDelete(request, response);
-
-        // Assert
         Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
     }
 
     @Test
     void testDoDeleteWithInvalidId() throws Exception {
-        // Arrange
         Mockito.when(request.getPathInfo()).thenReturn("/");
         Mockito.when(response.getWriter()).thenReturn(printWriter);
-
-        // Act
         orderServlet.doDelete(request, response);
-
-        // Assert
         Mockito.verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
     }
 

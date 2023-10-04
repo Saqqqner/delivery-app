@@ -6,11 +6,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.adel.deliveryapp.servlet.dto.CreateCustomerDTO;
-import ru.adel.deliveryapp.servlet.mapper.CustomerMapper;
-import ru.adel.deliveryapp.servlet.dto.CustomerViewDTO;
 import ru.adel.deliveryapp.service.CustomerService;
 import ru.adel.deliveryapp.service.impl.CustomerServiceImpl;
+import ru.adel.deliveryapp.servlet.dto.CreateCustomerDTO;
+import ru.adel.deliveryapp.servlet.dto.CustomerViewDTO;
+import ru.adel.deliveryapp.servlet.mapper.CustomerMapper;
 import ru.adel.deliveryapp.util.CustomerNotFoundException;
 import ru.adel.deliveryapp.util.DuplicateException;
 
@@ -21,8 +21,9 @@ import java.util.List;
 
 @WebServlet("/customers/*")
 public class CustomerServlet extends HttpServlet {
-    private  static final String INTERNAL_MSG ="Internal Server Error";
-    private static final String CUSTOMER_ID_IS_REQUIRED_MSG ="Customer ID is required";
+    private static final String INTERNAL_MSG = "Internal Server Error";
+    private static final String CUSTOMER_ID_IS_REQUIRED_MSG = "Customer ID is required";
+    private static final String INVALID_ID_MSG = "Invalid ID parameter";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private CustomerService customerService;
     private CustomerMapper customerMapper;
@@ -46,7 +47,9 @@ public class CustomerServlet extends HttpServlet {
                     id = Long.parseLong(parts[2]);
                 } catch (NumberFormatException e) {
                     resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    resp.getWriter().println("Invalid ID parameter");
+                    resp.getWriter().println(INVALID_ID_MSG);
+
+                    resp.getWriter().println();
                     return;
                 }
             }
@@ -107,6 +110,9 @@ public class CustomerServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().println(CUSTOMER_ID_IS_REQUIRED_MSG);
             }
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().println(INVALID_ID_MSG);
         } catch (CustomerNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().println(e.getMessage());
@@ -116,7 +122,6 @@ public class CustomerServlet extends HttpServlet {
         } catch (IOException | SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
-
         }
     }
 
@@ -142,9 +147,12 @@ public class CustomerServlet extends HttpServlet {
         } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
-
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().println(INVALID_ID_MSG);
         }
     }
+
     private void respConfig(HttpServletResponse resp) {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");

@@ -6,10 +6,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.adel.deliveryapp.servlet.mapper.AddressMapper;
-import ru.adel.deliveryapp.servlet.dto.AddressDTO;
 import ru.adel.deliveryapp.service.AddressService;
 import ru.adel.deliveryapp.service.impl.AddressServiceImpl;
+import ru.adel.deliveryapp.servlet.dto.AddressDTO;
+import ru.adel.deliveryapp.servlet.mapper.AddressMapper;
+import ru.adel.deliveryapp.util.AddressNotFoundException;
 import ru.adel.deliveryapp.util.CustomerNotFoundException;
 import ru.adel.deliveryapp.util.DuplicateException;
 
@@ -22,6 +23,7 @@ import java.util.List;
 public class AddressServlet extends HttpServlet {
     private static final String INTERNAL_MSG = "Internal Server Error";
     private static final String ADDRESS_ID_REQUIRED_MSG = "Address ID is required";
+    private static final String INVALID_ID_MSG = "Invalid ID parameter";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private AddressService addressService;
     private AddressMapper addressMapper;
@@ -56,7 +58,7 @@ public class AddressServlet extends HttpServlet {
                     PrintWriter out = resp.getWriter();
                     out.print(jsonResponse);
                     out.flush();
-                } catch (CustomerNotFoundException e) {
+                } catch (AddressNotFoundException e) {
                     resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     resp.getWriter().println(e.getMessage());
                 }
@@ -78,18 +80,13 @@ public class AddressServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         respConfig(resp);
         try {
-            // Извлечение данных нового пользователя из тела POST-запроса
             AddressDTO addressDTO = objectMapper.readValue(req.getInputStream(), AddressDTO.class);
-            // Создание нового пользователя
             addressService.save(addressMapper.addressDTOToAddress(addressDTO));
-            // Отправка ответа с кодом 201 Created
             resp.setStatus(HttpServletResponse.SC_CREATED);
         } catch (DuplicateException e) {
-            // Если пользователь с такими данными уже существует, отправляем код 409 Conflict
             resp.setStatus(HttpServletResponse.SC_CONFLICT);
             resp.getWriter().println(e.getMessage());
         } catch (IOException | SQLException e) {
-            // Обработка других ошибок, возникших при сохранении пользователя
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
         }
@@ -111,7 +108,10 @@ public class AddressServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().println(ADDRESS_ID_REQUIRED_MSG);
             }
-        } catch (CustomerNotFoundException e) {
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().println(INVALID_ID_MSG);
+        } catch (AddressNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().println(e.getMessage());
         } catch (DuplicateException e) {
@@ -138,7 +138,10 @@ public class AddressServlet extends HttpServlet {
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
-        } catch (CustomerNotFoundException e) {
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().println(INVALID_ID_MSG);
+        } catch (AddressNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().println(e.getMessage());
         } catch (SQLException e) {
@@ -146,6 +149,7 @@ public class AddressServlet extends HttpServlet {
             resp.getWriter().println(INTERNAL_MSG);
         }
     }
+
     private void respConfig(HttpServletResponse resp) {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");

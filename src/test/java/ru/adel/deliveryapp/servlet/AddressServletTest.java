@@ -54,16 +54,13 @@ class AddressServletTest {
 
     @Test
     void testDoGetWithValidId() throws ServletException, IOException, CustomerNotFoundException, SQLException {
-        // Arrange
         Long addressId = 1L;
         AddressDTO addressDTO = new AddressDTO();
         Mockito.when(request.getRequestURI()).thenReturn("/address/" + addressId);
         Mockito.when(addressService.getAddressById(addressId)).thenReturn(new Address());
         Mockito.when(addressMapper.addressToAddressDTO(Mockito.any())).thenReturn(addressDTO);
         Mockito.when(response.getWriter()).thenReturn(printWriter);
-
         addressServlet.doGet(request, response);
-
         Mockito.verify(response).setContentType("application/json");
         Mockito.verify(response).setCharacterEncoding("UTF-8");
         Mockito.verify(response, Mockito.never()).setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -74,20 +71,15 @@ class AddressServletTest {
 
     @Test
     void testDoGetWithInvalidId() throws ServletException, IOException, CustomerNotFoundException, SQLException {
-        // Arrange
         Mockito.when(request.getRequestURI()).thenReturn("/addresses/invalidId");
         Mockito.when(response.getWriter()).thenReturn(printWriter);
-        // Act
         addressServlet.doGet(request, response);
-
-        // Assert
         Mockito.verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
         Mockito.verify(response.getWriter()).println("Invalid ID parameter");
     }
 
     @Test
     void testDoGetAllAddresses() throws ServletException, IOException, SQLException {
-        // Arrange
         Mockito.when(request.getRequestURI()).thenReturn("/addresses");
         List<Address> addresses = Arrays.asList(
                 new Address(1L, "123", "123", "123", "123"),
@@ -100,11 +92,7 @@ class AddressServletTest {
         Mockito.when(addressService.findAll()).thenReturn(addresses);
         Mockito.when(addressMapper.addressListTOAddressDTOList(addresses)).thenReturn(addressDTOS);
         Mockito.when(response.getWriter()).thenReturn(printWriter);
-
-        // Act
         addressServlet.doGet(request, response);
-
-        // Assert
         Mockito.verify(response).setContentType("application/json");
         Mockito.verify(response).setCharacterEncoding("UTF-8");
         Mockito.verify(response, Mockito.never()).setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -114,14 +102,9 @@ class AddressServletTest {
 
     @Test
     void testDoPost() throws ServletException, IOException, DuplicateException, SQLException {
-        // Arrange
         AddressDTO addressDTO = new AddressDTO();
         Mockito.when(request.getInputStream()).thenReturn(getInputStream(addressDTO));
-
-        // Act
         addressServlet.doPost(request, response);
-
-        // Assert
         Mockito.verify(response).setContentType("application/json");
         Mockito.verify(response).setCharacterEncoding("UTF-8");
         Mockito.verify(response, Mockito.never()).setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -135,50 +118,32 @@ class AddressServletTest {
         AddressDTO addressDTO = new AddressDTO();
         Mockito.when(request.getPathInfo()).thenReturn("/" + addressId);
         Mockito.when(request.getInputStream()).thenReturn(getInputStream(addressDTO));
-
-        // Act
         addressServlet.doPut(request, response);
-
-        // Assert
         Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
     }
 
     @Test
     void testDoPutWithInvalidId() throws ServletException, IOException, CustomerNotFoundException, DuplicateException, SQLException {
-        // Arrange
         Mockito.when(request.getPathInfo()).thenReturn("/");
         Mockito.when(response.getWriter()).thenReturn(printWriter);
-        // Act
         addressServlet.doPut(request, response);
-
-        // Assert
         Mockito.verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
         Mockito.verify(response.getWriter()).println("Address ID is required");
     }
 
     @Test
     void testDoDeleteWithValidId() throws ServletException, IOException, CustomerNotFoundException, SQLException {
-        // Arrange
         Long addressId = 1L;
         Mockito.when(request.getPathInfo()).thenReturn("/" + addressId);
-        // Act
         addressServlet.doDelete(request, response);
-
-        // Assert
         Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
     }
 
     @Test
     void testDoDeleteWithInvalidId() throws ServletException, IOException, CustomerNotFoundException, SQLException {
-        // Arrange
         Mockito.lenient().when(response.getWriter()).thenReturn(printWriter);
         Mockito.lenient().when(request.getPathInfo()).thenReturn("/");
-
-
-        // Act
         addressServlet.doDelete(request, response);
-
-        // Assert
         Mockito.verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
     }
 

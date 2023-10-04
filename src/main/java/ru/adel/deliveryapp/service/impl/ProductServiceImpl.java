@@ -41,6 +41,7 @@ public class ProductServiceImpl implements ProductService {
     public void update(Long id, Product product) throws SQLException {
         Product existingProduct = productDao.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND_MSG + id));
+        product.setId(id);
         checkAndUpdate(existingProduct, product);
         productDao.update(product);
     }
