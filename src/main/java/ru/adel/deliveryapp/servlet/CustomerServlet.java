@@ -22,6 +22,7 @@ import java.util.List;
 @WebServlet("/customers/*")
 public class CustomerServlet extends HttpServlet {
     private  static final String INTERNAL_MSG ="Internal Server Error";
+    private static final String CUSTOMER_ID_IS_REQUIRED_MSG ="Customer ID is required";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private CustomerService customerService;
     private CustomerMapper customerMapper;
@@ -35,8 +36,7 @@ public class CustomerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
+        respConfig(resp);
         try {
             String requestURI = req.getRequestURI();
             String[] parts = requestURI.split("/");
@@ -71,26 +71,23 @@ public class CustomerServlet extends HttpServlet {
         } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
-            e.printStackTrace();
         }
     }
 
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        respConfig(resp);
         try {
-            CreateCustomerDTO newCustomerDTO = objectMapper.readValue(request.getInputStream(), CreateCustomerDTO.class);
+            CreateCustomerDTO newCustomerDTO = objectMapper.readValue(req.getInputStream(), CreateCustomerDTO.class);
             customerService.save(customerMapper.customerDTOToCustomer(newCustomerDTO));
-            response.setStatus(HttpServletResponse.SC_CREATED);
+            resp.setStatus(HttpServletResponse.SC_CREATED);
         } catch (DuplicateException e) {
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
-            response.getWriter().println(e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_CONFLICT);
+            resp.getWriter().println(e.getMessage());
         } catch (IOException | SQLException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().println(INTERNAL_MSG);
-            e.printStackTrace();
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().println(INTERNAL_MSG);
         }
     }
 
@@ -108,7 +105,7 @@ public class CustomerServlet extends HttpServlet {
                 }
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().println("Customer ID is required");
+                resp.getWriter().println(CUSTOMER_ID_IS_REQUIRED_MSG);
             }
         } catch (CustomerNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -119,7 +116,7 @@ public class CustomerServlet extends HttpServlet {
         } catch (IOException | SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
-            e.printStackTrace();
+
         }
     }
 
@@ -137,6 +134,7 @@ public class CustomerServlet extends HttpServlet {
                 }
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().println(CUSTOMER_ID_IS_REQUIRED_MSG);
             }
         } catch (CustomerNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -144,8 +142,12 @@ public class CustomerServlet extends HttpServlet {
         } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
-            e.printStackTrace();
+
         }
+    }
+    private void respConfig(HttpServletResponse resp) {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
     }
 
 }

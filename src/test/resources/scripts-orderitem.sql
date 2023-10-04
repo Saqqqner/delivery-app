@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS Customers (
 );
 CREATE TABLE IF NOT EXISTS Products (
                                         id SERIAL PRIMARY KEY,
-                                        name VARCHAR(255) NOT NULL,
+                                        name VARCHAR(255) NOT NULL unique,
                                         description TEXT,
                                         price DECIMAL(10, 2) NOT NULL,
                                         stock BIGINT NOT NULL
@@ -23,17 +23,17 @@ CREATE TABLE IF NOT EXISTS Orders  (
                                        shipping_address_id BIGINT NOT NULL,
                                        status VARCHAR(255) NOT NULL,
                                        total_price DECIMAL(10, 2) NOT NULL,
-                                       FOREIGN KEY (customer_id) REFERENCES Customers(id),
-                                       FOREIGN KEY (shipping_address_id) REFERENCES Address(id)
+                                       FOREIGN KEY (customer_id) REFERENCES Customers(id)  on DELETE set NULL ,
+                                       FOREIGN KEY (shipping_address_id) REFERENCES Address(id) on DELETE set NULL
 );
-CREATE TABLE IF NOT EXISTS OrderItems (
-                                          id SERIAL PRIMARY KEY,
-                                          order_id BIGINT NOT NULL,
-                                          product_id BIGINT NOT NULL,
-                                          quantity BIGINT NOT NULL,
-                                          product_total_price DECIMAL(10, 2) NOT NULL,
-                                          FOREIGN KEY (order_id) REFERENCES Orders(id),
-                                          FOREIGN KEY (product_id) REFERENCES Products(id)
+CREATE TABLE IF NOT EXISTS Order_Items (
+                                           id SERIAL PRIMARY KEY,
+                                           order_id BIGINT NOT NULL,
+                                           product_id BIGINT NOT NULL,
+                                           quantity BIGINT NOT NULL,
+                                           product_total_price DECIMAL(10, 2) NOT NULL,
+                                           FOREIGN KEY (order_id) REFERENCES Orders(id)  on DELETE CASCADE,
+                                           FOREIGN KEY (product_id) REFERENCES Products(id) on DELETE CASCADE
 );
 insert into Customers (username, email) VALUES ('Adel','AdelMail.ru');
 insert into Customers (username, email) VALUES ('Adel1','Adel1Mail.ru');

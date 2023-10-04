@@ -21,6 +21,7 @@ import java.util.List;
 @WebServlet("/address/*")
 public class AddressServlet extends HttpServlet {
     private static final String INTERNAL_MSG = "Internal Server Error";
+    private static final String ADDRESS_ID_REQUIRED_MSG = "Address ID is required";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private AddressService addressService;
     private AddressMapper addressMapper;
@@ -34,8 +35,7 @@ public class AddressServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
+        respConfig(resp);
         try {
             String requestURI = req.getRequestURI();
             String[] parts = requestURI.split("/");
@@ -70,31 +70,28 @@ public class AddressServlet extends HttpServlet {
         } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
-            e.printStackTrace();
         }
     }
 
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        respConfig(resp);
         try {
             // Извлечение данных нового пользователя из тела POST-запроса
-            AddressDTO addressDTO = objectMapper.readValue(request.getInputStream(), AddressDTO.class);
+            AddressDTO addressDTO = objectMapper.readValue(req.getInputStream(), AddressDTO.class);
             // Создание нового пользователя
             addressService.save(addressMapper.addressDTOToAddress(addressDTO));
             // Отправка ответа с кодом 201 Created
-            response.setStatus(HttpServletResponse.SC_CREATED);
+            resp.setStatus(HttpServletResponse.SC_CREATED);
         } catch (DuplicateException e) {
             // Если пользователь с такими данными уже существует, отправляем код 409 Conflict
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
-            response.getWriter().println(e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_CONFLICT);
+            resp.getWriter().println(e.getMessage());
         } catch (IOException | SQLException e) {
             // Обработка других ошибок, возникших при сохранении пользователя
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().println(INTERNAL_MSG);
-            e.printStackTrace();
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().println(INTERNAL_MSG);
         }
     }
 
@@ -112,6 +109,7 @@ public class AddressServlet extends HttpServlet {
                 }
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().println(ADDRESS_ID_REQUIRED_MSG);
             }
         } catch (CustomerNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -122,7 +120,6 @@ public class AddressServlet extends HttpServlet {
         } catch (IOException | SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
-            e.printStackTrace();
         }
     }
 
@@ -147,8 +144,12 @@ public class AddressServlet extends HttpServlet {
         } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
-            e.printStackTrace();
         }
     }
+    private void respConfig(HttpServletResponse resp) {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+    }
+
 
 }

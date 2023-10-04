@@ -19,21 +19,7 @@ public class OrderItemDaoImpl implements OrderItemDao {
     }
 
 
-    @Override
-    public boolean deleteAllByOrderId(Long orderId) throws SQLException {
-        int updatedRows;
-        sessionManager.beginSession();
-        try (Connection connection = sessionManager.getCurrentSession();
-             PreparedStatement pst = connection.prepareStatement(SQLTask.DELETE_ORDER_ITEM_BY_ORDER_ID.QUERY)) {
-            pst.setLong(1, orderId);
-            updatedRows = pst.executeUpdate();
-            sessionManager.commitSession();
-        } catch (SQLException ex) {
-            sessionManager.rollbackSession();
-            throw ex;
-        }
-        return updatedRows > 0;
-    }
+
 
 
     @Override
@@ -80,9 +66,9 @@ public class OrderItemDaoImpl implements OrderItemDao {
     }
 
     enum SQLTask {
-        INSERT_ORDER_ITEM("INSERT INTO orderitems (order_id, product_id, quantity, product_total_price) VALUES (?, ?, ?, ?)"),
-        DELETE_ORDER_ITEM_BY_ORDER_ID("DELETE FROM orderitems WHERE order_id = ?"),
-        GET_ALL_ORDER_ITEMS_BY_ORDER_ID("SELECT orderitems.id, orderitems.order_id, orderitems.product_id, orderitems.quantity, orderitems.product_total_price FROM orderitems WHERE order_id = ?");
+        INSERT_ORDER_ITEM("INSERT INTO order_items (order_id, product_id, quantity, product_total_price) VALUES (?, ?, ?, ?)"),
+
+        GET_ALL_ORDER_ITEMS_BY_ORDER_ID("SELECT order_items.id, order_items.order_id, order_items.product_id, order_items.quantity, order_items.product_total_price FROM order_items WHERE order_id = ?");
 
         String QUERY;
 

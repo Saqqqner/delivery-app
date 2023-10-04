@@ -1,8 +1,6 @@
 package ru.adel.deliveryapp.dao.impl;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
@@ -19,7 +17,6 @@ import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 @Testcontainers
 class OrderItemDaoImplTest {
@@ -55,32 +52,28 @@ class OrderItemDaoImplTest {
         dataSource = CustomDataSourceConfig.getHikariDataSource();
         sessionManager = new SessionManagerJdbc(dataSource);
         orderItemDao = new OrderItemDaoImpl(sessionManager);
-        product = new Product(1L,"Potato","Картошка",BigDecimal.valueOf(2.00),300L);
-        product1 =new Product(2L,"Orange","Апельсин",BigDecimal.valueOf(4.00),400L);
+        product = new Product(1L, "Potato", "Картошка", BigDecimal.valueOf(2.00), 300L);
+        product1 = new Product(2L, "Orange", "Апельсин", BigDecimal.valueOf(4.00), 400L);
         order = new Order();
         order1 = new Order();
         order.setId(1L);
         order1.setId(2L);
         createOrderItems();
     }
+
     @Test
     void findAllByOrderId_shouldReturnOrder() throws SQLException {
         List<OrderItem> orderItems = orderItemDao.findAllByOrderId(1L);
-        Assertions.assertEquals(2,orderItems.size());
+        Assertions.assertEquals(2, orderItems.size());
         Assertions.assertEquals(1L, orderItems.get(0).getProduct().getId());
         Assertions.assertEquals(2L, orderItems.get(1).getProduct().getId());
         Assertions.assertEquals(0, BigDecimal.valueOf(6.00).compareTo(orderItems.get(0).getProductTotalPrice()));
         Assertions.assertEquals(0, BigDecimal.valueOf(12.00).compareTo(orderItems.get(1).getProductTotalPrice()));
     }
+
+
     @Test
-    void deleteAllByOrderId_shouldReturnTrueForExistingOrderItems() throws SQLException {
-        boolean result = orderItemDao.deleteAllByOrderId(order.getId());
-        List<OrderItem> orderItems = orderItemDao.findAllByOrderId(order.getId());
-        Assertions.assertTrue(result);
-        Assertions.assertEquals(0,orderItems.size());
-    }
-    @Test
-    void saveOrderItemsByOrderId_shouldSaveOrderItems()throws SQLException{
+    void saveOrderItemsByOrderId_shouldSaveOrderItems() throws SQLException {
         OrderItem orderItem = new OrderItem();
         orderItem.setOrder(order);
         orderItem.setProduct(product);
@@ -88,12 +81,12 @@ class OrderItemDaoImplTest {
         orderItem.calculateTotalPrice();
         orderItemDao.save(orderItem, order.getId());
         List<OrderItem> orderItems = orderItemDao.findAllByOrderId(1L);
-        Assertions.assertEquals(3,orderItems.size());
-        Assertions.assertEquals(0,BigDecimal.valueOf(8.00).compareTo(orderItems.get(2).getProductTotalPrice()));
+        Assertions.assertEquals(3, orderItems.size());
+        Assertions.assertEquals(0, BigDecimal.valueOf(8.00).compareTo(orderItems.get(2).getProductTotalPrice()));
     }
 
 
-    private void createOrderItems() throws SQLException{
+    private void createOrderItems() throws SQLException {
         OrderItem orderItem = new OrderItem();
         orderItem.setOrder(order);
         orderItem.setProduct(product);
@@ -109,9 +102,9 @@ class OrderItemDaoImplTest {
         orderItem2.setProduct(product1);
         orderItem2.setQuantity(3L);
         orderItem2.calculateTotalPrice();
-        orderItemDao.save(orderItem,order.getId());
-        orderItemDao.save(orderItem1,order1.getId());
-        orderItemDao.save(orderItem2,order.getId());
+        orderItemDao.save(orderItem, order.getId());
+        orderItemDao.save(orderItem1, order1.getId());
+        orderItemDao.save(orderItem2, order.getId());
     }
 
 

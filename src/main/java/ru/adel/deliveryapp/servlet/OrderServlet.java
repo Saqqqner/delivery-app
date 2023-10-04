@@ -6,13 +6,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.adel.deliveryapp.servlet.dto.OrderDTO;
-import ru.adel.deliveryapp.servlet.dto.OrderViewDTO;
 import ru.adel.deliveryapp.service.OrderService;
 import ru.adel.deliveryapp.service.impl.OrderServiceImpl;
+import ru.adel.deliveryapp.servlet.dto.OrderDTO;
+import ru.adel.deliveryapp.servlet.dto.OrderViewDTO;
 import ru.adel.deliveryapp.servlet.mapper.OrderMapper;
 import ru.adel.deliveryapp.util.AddressNotFoundException;
 import ru.adel.deliveryapp.util.CustomerNotFoundException;
+import ru.adel.deliveryapp.util.DuplicateException;
 import ru.adel.deliveryapp.util.OrderNotFoundException;
 
 import java.io.IOException;
@@ -74,7 +75,6 @@ public class OrderServlet extends HttpServlet {
         } catch (SQLException | RuntimeException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
-            e.printStackTrace();
         }
     }
 
@@ -92,7 +92,6 @@ public class OrderServlet extends HttpServlet {
         } catch (IOException | SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
-            e.printStackTrace();
         }
     }
 
@@ -100,36 +99,32 @@ public class OrderServlet extends HttpServlet {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         respConfig(resp);
         try {
-            String requestURI = req.getRequestURI();
-            String[] parts = requestURI.split("/");
-            Long id = null;
-            if (parts.length > 2) {
-                try {
-                    id = Long.parseLong(parts[2]);
-                } catch (NumberFormatException e) {
-                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    resp.getWriter().println(INVALID_ID_MSG);
-                    return;
-                }
-            }
-            if (id != null) {
-                try {
+            String pathInfo = req.getPathInfo();
+            if (pathInfo != null && !pathInfo.equals("/")) {
+                String[] pathParts = pathInfo.split("/");
+                if (pathParts.length == 2) {
+                    Long id = Long.parseLong(pathParts[1]);
                     orderService.updateOrderStatusDelivered(id);
                     resp.setStatus(HttpServletResponse.SC_OK);
-                } catch (OrderNotFoundException e) {
-                    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    resp.getWriter().println(e.getMessage());
                 }
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().println(ORDER_ID_REQUIRED_MSG);
             }
-        } catch (SQLException | RuntimeException e) {
+        } catch (OrderNotFoundException e) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            resp.getWriter().println(e.getMessage());
+        } catch (DuplicateException e) {
+            resp.setStatus(HttpServletResponse.SC_CONFLICT);
+            resp.getWriter().println(e.getMessage());
+        } catch (IOException | SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
-            e.printStackTrace();
+
         }
+
     }
+
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
@@ -143,6 +138,7 @@ public class OrderServlet extends HttpServlet {
                 }
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().println(ORDER_ID_REQUIRED_MSG);
             }
         } catch (OrderNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -150,7 +146,6 @@ public class OrderServlet extends HttpServlet {
         } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
-            e.printStackTrace();
         }
     }
 

@@ -153,7 +153,7 @@ class CustomerServletTest {
     @Test
     void testDoPutWithInvalidId() throws ServletException, IOException, CustomerNotFoundException, DuplicateException, SQLException {
         // Arrange
-        Mockito.lenient().when(request.getRequestURI()).thenReturn("/invalidId");
+        Mockito.when(request.getPathInfo()).thenReturn("/");
         Mockito.when(response.getWriter()).thenReturn(printWriter);
 
         // Act
@@ -180,14 +180,15 @@ class CustomerServletTest {
     @Test
     void testDoDeleteWithInvalidId() throws ServletException, IOException, CustomerNotFoundException, SQLException {
         // Arrange
-        Mockito.lenient().when(request.getRequestURI()).thenReturn("/invalidId");
-
+        Mockito.when(request.getPathInfo()).thenReturn("/");
+        Mockito.when(response.getWriter()).thenReturn(printWriter);
 
         // Act
         customerServlet.doDelete(request, response);
 
         // Assert
         Mockito.verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        Mockito.verify(response.getWriter()).println("Customer ID is required");
     }
 
 

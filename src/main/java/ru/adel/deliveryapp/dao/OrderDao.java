@@ -8,4 +8,6 @@ import java.util.List;
 public interface OrderDao extends JdbcRepository<Order,Long> {
     List<Order> findAllByCustomerId(Long customerId) throws SQLException;
 
+
+
 }

@@ -189,7 +189,6 @@ class OrderServiceImplTest {
 
         // Assert
         Mockito.verify(orderDao, Mockito.times(1)).deleteById(orderId);
-        Mockito.verify(orderItemDao, Mockito.times(1)).deleteAllByOrderId(orderId);
     }
 
     @Test
@@ -200,7 +199,6 @@ class OrderServiceImplTest {
 
         // Act and Assert
         Assertions.assertThrows(OrderNotFoundException.class, () -> orderService.deleteOrder(orderId));
-        Mockito.verify(orderItemDao, Mockito.never()).deleteAllByOrderId(orderId);
     }
 }
 

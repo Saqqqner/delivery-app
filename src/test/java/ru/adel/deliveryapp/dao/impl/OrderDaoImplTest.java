@@ -48,7 +48,7 @@ class OrderDaoImplTest {
     }
 
     @BeforeEach
-    void setUp() throws SQLException {
+    void setUp()   {
         dataSource = CustomDataSourceConfig.getHikariDataSource();
         sessionManager = new SessionManagerJdbc(dataSource);
         orderDao = new OrderDaoImpl(sessionManager);
@@ -66,7 +66,7 @@ class OrderDaoImplTest {
         Assertions.assertTrue(orderById.isPresent());
         Assertions.assertEquals(1L, orderById.get().getCustomer().getId());
         Assertions.assertEquals(1L, orderById.get().getShippingAddress().getId());
-        Assertions.assertEquals(0,BigDecimal.TEN.compareTo( orderById.get().getTotalPrice()));
+        Assertions.assertEquals(0, BigDecimal.TEN.compareTo(orderById.get().getTotalPrice()));
         Assertions.assertEquals("PENDING", orderById.get().getStatus());
     }
 

@@ -38,8 +38,7 @@ public class ProductServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
+        respConfig(resp);
         try {
             String requestURI = req.getRequestURI();
             String[] parts = requestURI.split("/");
@@ -75,25 +74,22 @@ public class ProductServlet extends HttpServlet {
         } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
-            e.printStackTrace();
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        respConfig(resp);
         try {
-            ProductByStockDTO productByStockDTO = objectMapper.readValue(request.getInputStream(), ProductByStockDTO.class);
+            ProductByStockDTO productByStockDTO = objectMapper.readValue(req.getInputStream(), ProductByStockDTO.class);
             productService.save(productMapper.productByStockDTOToProduct(productByStockDTO));
-            response.setStatus(HttpServletResponse.SC_CREATED);
+            resp.setStatus(HttpServletResponse.SC_CREATED);
         } catch (DuplicateException e) {
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
-            response.getWriter().println(e.getMessage());
+            resp.setStatus(HttpServletResponse.SC_CONFLICT);
+            resp.getWriter().println(e.getMessage());
         } catch (IOException | SQLException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().println(INTERNAL_MSG);
-            e.printStackTrace();
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().println(INTERNAL_MSG);
         }
     }
 
@@ -111,7 +107,6 @@ public class ProductServlet extends HttpServlet {
                 }
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-
                 resp.getWriter().println(PRODUCT_ID_IS_REQUIRED_MSG);
             }
         } catch (ProductNotFoundException e) {
@@ -123,7 +118,6 @@ public class ProductServlet extends HttpServlet {
         } catch (IOException | SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
-            e.printStackTrace();
         }
     }
 
@@ -148,7 +142,10 @@ public class ProductServlet extends HttpServlet {
         } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println(INTERNAL_MSG);
-            e.printStackTrace();
         }
+    }
+    private void respConfig(HttpServletResponse resp) {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
     }
 }

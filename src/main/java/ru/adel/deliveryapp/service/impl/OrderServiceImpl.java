@@ -20,6 +20,7 @@ import java.util.List;
 
 public class OrderServiceImpl implements OrderService {
     private static final String ORDER_NOT_FOUND_MSG = "Order not found with ID: ";
+    private static final String CUSTOMER_NOT_FOUND_MSG = "Customer not found with ID: ";
     private final OrderDao orderDao;
     private final ProductService productService;
     private final CustomerDao customerDao;
@@ -62,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
 
     public Long createOrder(OrderDTO orderDTO) throws SQLException, CustomerNotFoundException, AddressNotFoundException {
         Customer customer = customerDao.findById(orderDTO.getCustomerId())
-                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with ID: "));
+                .orElseThrow(() -> new CustomerNotFoundException(CUSTOMER_NOT_FOUND_MSG + orderDTO.getCustomerId()));
         Address address = addressService.getAddressById(orderDTO.getAddressId());
         Order order = new Order();
         order.setShippingAddress(address);
@@ -88,6 +89,7 @@ public class OrderServiceImpl implements OrderService {
         orderDao.update(existingOrder);
     }
 
+
     private List<OrderItem> getOrderItemsByRepo(OrderDTO orderDTO, Order order) throws SQLException {
         List<OrderItem> orderItems = new ArrayList<>();
         for (OrderItemDTO orderItemDTO : orderDTO.getOrderItems()) {
@@ -108,6 +110,5 @@ public class OrderServiceImpl implements OrderService {
         if (!orderDao.deleteById(id)) {
             throw new OrderNotFoundException(ORDER_NOT_FOUND_MSG + id);
         }
-        orderItemDao.deleteAllByOrderId(id);
     }
 }

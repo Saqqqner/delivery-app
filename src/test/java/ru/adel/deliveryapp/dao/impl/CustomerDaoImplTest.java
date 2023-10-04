@@ -17,9 +17,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 @Testcontainers
 @ExtendWith(MockitoExtension.class)
 public class CustomerDaoImplTest {
@@ -83,14 +80,15 @@ public class CustomerDaoImplTest {
         // Act
         Assertions.assertThrows(SQLException.class, () -> customerDao.deleteById(-1L));
     }
+
     @Test
     void findAll_shouldReturnListOfProducts() throws SQLException {
         saveTestCustomer("TestCustomer", "TestCustomer@mail.ru");
         saveTestCustomer("TestCustomer1", "TestCustomer1@mail.ru");
         List<Customer> customers = customerDao.findAll();
         Assertions.assertEquals(2, customers.size());
-        Assertions.assertEquals("TestCustomer",customers.get(0).getUsername());
-        Assertions.assertEquals("TestCustomer1",customers.get(1).getUsername());
+        Assertions.assertEquals("TestCustomer", customers.get(0).getUsername());
+        Assertions.assertEquals("TestCustomer1", customers.get(1).getUsername());
     }
 
 
@@ -106,6 +104,7 @@ public class CustomerDaoImplTest {
         Assertions.assertEquals(customer.getUsername(), customerById.get().getUsername());
         Assertions.assertEquals(customer.getEmail(), customerById.get().getEmail());
     }
+
     @Test
     void update_shouldUpdateProductDetails() throws SQLException {
         Long customerId = saveTestCustomer("TestCustomer", "TestCustomer@mail.ru");

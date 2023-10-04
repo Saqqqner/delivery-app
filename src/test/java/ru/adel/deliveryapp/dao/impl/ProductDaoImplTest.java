@@ -26,6 +26,7 @@ class ProductDaoImplTest {
     private ProductDaoImpl productDao;
     private DataSource dataSource;
 
+
     @BeforeAll
     public static void beforeAll() {
         System.setProperty("jdbc.url", postgresContainer.getJdbcUrl());

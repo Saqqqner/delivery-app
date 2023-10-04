@@ -2,6 +2,7 @@ package ru.adel.deliveryapp.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ReadListener;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,32 +13,28 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.adel.deliveryapp.entity.Order;
-import ru.adel.deliveryapp.service.OrderService;
-import ru.adel.deliveryapp.servlet.dto.OrderDTO;
-import ru.adel.deliveryapp.servlet.dto.OrderViewDTO;
-import ru.adel.deliveryapp.servlet.mapper.OrderMapper;
+import ru.adel.deliveryapp.entity.Address;
+import ru.adel.deliveryapp.service.AddressService;
+import ru.adel.deliveryapp.servlet.dto.AddressDTO;
+import ru.adel.deliveryapp.servlet.mapper.AddressMapper;
+import ru.adel.deliveryapp.util.CustomerNotFoundException;
+import ru.adel.deliveryapp.util.DuplicateException;
 
 import java.io.*;
-import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.verify;
-
-
 @ExtendWith(MockitoExtension.class)
-class OrderServletTest {
+class AddressServletTest {
+    @Mock
+    private AddressService addressService;
 
     @Mock
-    private OrderService orderService;
-
-    @Mock
-    private OrderMapper orderMapper;
+    private AddressMapper addressMapper;
 
     @InjectMocks
-    private OrderServlet orderServlet;
+    private AddressServlet addressServlet;
 
     @Mock
     private HttpServletRequest request;
@@ -47,6 +44,7 @@ class OrderServletTest {
     @Mock
     private HttpServletResponse response;
 
+
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -55,35 +53,32 @@ class OrderServletTest {
     }
 
     @Test
-    void testDoGetWithValidId() throws Exception {
+    void testDoGetWithValidId() throws ServletException, IOException, CustomerNotFoundException, SQLException {
         // Arrange
-        Long orderId = 1L;
-        OrderViewDTO orderViewDTO = new OrderViewDTO();
-        Mockito.when(request.getRequestURI()).thenReturn("/orders/" + orderId);
-        Mockito.when(orderService.getOrderById(orderId)).thenReturn(new Order()); // You should mock the actual return object
-        Mockito.when(orderMapper.orderToOrderViewDTO(Mockito.any())).thenReturn(orderViewDTO);
+        Long addressId = 1L;
+        AddressDTO addressDTO = new AddressDTO();
+        Mockito.when(request.getRequestURI()).thenReturn("/address/" + addressId);
+        Mockito.when(addressService.getAddressById(addressId)).thenReturn(new Address());
+        Mockito.when(addressMapper.addressToAddressDTO(Mockito.any())).thenReturn(addressDTO);
         Mockito.when(response.getWriter()).thenReturn(printWriter);
 
-        // Act
-        orderServlet.doGet(request, response);
+        addressServlet.doGet(request, response);
 
-        // Assert
         Mockito.verify(response).setContentType("application/json");
         Mockito.verify(response).setCharacterEncoding("UTF-8");
         Mockito.verify(response, Mockito.never()).setStatus(HttpServletResponse.SC_BAD_REQUEST);
         Mockito.verify(response).getWriter();
-        Mockito.verify(response.getWriter()).print(objectMapper.writeValueAsString(orderViewDTO));
+        Mockito.verify(response.getWriter()).print(objectMapper.writeValueAsString(addressDTO));
         Mockito.verify(response.getWriter()).flush();
     }
 
     @Test
-    void testDoGetWithInvalidId() throws Exception {
+    void testDoGetWithInvalidId() throws ServletException, IOException, CustomerNotFoundException, SQLException {
         // Arrange
-        Mockito.when(request.getRequestURI()).thenReturn("/orders/invalidId");
+        Mockito.when(request.getRequestURI()).thenReturn("/addresses/invalidId");
         Mockito.when(response.getWriter()).thenReturn(printWriter);
-
         // Act
-        orderServlet.doGet(request, response);
+        addressServlet.doGet(request, response);
 
         // Assert
         Mockito.verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -91,40 +86,40 @@ class OrderServletTest {
     }
 
     @Test
-    void testDoGetAllOrders() throws Exception {
+    void testDoGetAllAddresses() throws ServletException, IOException, SQLException {
         // Arrange
-        Mockito.when(request.getRequestURI()).thenReturn("/orders");
-        List<Order> orders = Arrays.asList(
-                new Order(1L, null, null, new ArrayList<>(), "S"),
-                new Order(2L, null, null, new ArrayList<>(), "S")
+        Mockito.when(request.getRequestURI()).thenReturn("/addresses");
+        List<Address> addresses = Arrays.asList(
+                new Address(1L, "123", "123", "123", "123"),
+                new Address(2L, "1232", "1232", "1232", "1232")
         );
-        List<OrderViewDTO> orderViewDTOS = Arrays.asList(
-                new OrderViewDTO(1L, 1L, new ArrayList<>(), BigDecimal.valueOf(100.0), "S"),
-                new OrderViewDTO(2L, 2L, new ArrayList<>(), BigDecimal.valueOf(150.0), "S")
+        List<AddressDTO> addressDTOS = Arrays.asList(
+                new AddressDTO("123", "123", "123", "123"),
+                new AddressDTO("1232", "1232", "1232", "1232")
         );
-        Mockito.when(orderService.getAllOrders()).thenReturn(orders);
-        Mockito.when(orderMapper.orderListToOrderDTOList(orders)).thenReturn(orderViewDTOS);
+        Mockito.when(addressService.findAll()).thenReturn(addresses);
+        Mockito.when(addressMapper.addressListTOAddressDTOList(addresses)).thenReturn(addressDTOS);
         Mockito.when(response.getWriter()).thenReturn(printWriter);
 
         // Act
-        orderServlet.doGet(request, response);
+        addressServlet.doGet(request, response);
 
         // Assert
         Mockito.verify(response).setContentType("application/json");
         Mockito.verify(response).setCharacterEncoding("UTF-8");
         Mockito.verify(response, Mockito.never()).setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        Mockito.verify(response.getWriter()).print(objectMapper.writeValueAsString(orderViewDTOS));
+        Mockito.verify(response.getWriter()).print(objectMapper.writeValueAsString(addressDTOS));
         Mockito.verify(response.getWriter()).flush();
     }
 
     @Test
-    void testDoPost() throws Exception {
+    void testDoPost() throws ServletException, IOException, DuplicateException, SQLException {
         // Arrange
-        OrderDTO orderDTO = new OrderDTO();
-        Mockito.when(request.getInputStream()).thenReturn(getInputStream(orderDTO));
+        AddressDTO addressDTO = new AddressDTO();
+        Mockito.when(request.getInputStream()).thenReturn(getInputStream(addressDTO));
 
         // Act
-        orderServlet.doPost(request, response);
+        addressServlet.doPost(request, response);
 
         // Assert
         Mockito.verify(response).setContentType("application/json");
@@ -134,63 +129,66 @@ class OrderServletTest {
     }
 
     @Test
-    void testDoPutWithValidId() throws Exception {
+    void testDoPutWithValidId() throws ServletException, IOException, CustomerNotFoundException, DuplicateException, SQLException {
         // Arrange
-        Long orderId = 1L;
-        Mockito.lenient().when(response.getWriter()).thenReturn(printWriter);
-        Mockito.when(request.getPathInfo()).thenReturn("/" + orderId);
-        // Act
-        orderServlet.doPut(request, response);
-
-        // Assert
-        verify(orderService).updateOrderStatusDelivered(orderId);
-        verify(response).setStatus(HttpServletResponse.SC_OK);
-    }
-
-    @Test
-    void testDoPutWithInvalidId() throws Exception {
-        // Arrange
-        Mockito.when(request.getPathInfo()).thenReturn("/");
-        Mockito.when(response.getWriter()).thenReturn(printWriter);
-        // Act
-        orderServlet.doPut(request, response);
-
-        // Assert
-        Mockito.verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        Mockito.verify(response.getWriter()).println("Order ID is required");
-    }
-
-    @Test
-    void testDoDeleteWithValidId() throws Exception {
-        // Arrange
-        Long orderId = 1L;
-        Mockito.when(request.getPathInfo()).thenReturn("/" + orderId);
+        Long addressId = 1L;
+        AddressDTO addressDTO = new AddressDTO();
+        Mockito.when(request.getPathInfo()).thenReturn("/" + addressId);
+        Mockito.when(request.getInputStream()).thenReturn(getInputStream(addressDTO));
 
         // Act
-        orderServlet.doDelete(request, response);
+        addressServlet.doPut(request, response);
 
         // Assert
         Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
     }
 
     @Test
-    void testDoDeleteWithInvalidId() throws Exception {
+    void testDoPutWithInvalidId() throws ServletException, IOException, CustomerNotFoundException, DuplicateException, SQLException {
         // Arrange
         Mockito.when(request.getPathInfo()).thenReturn("/");
         Mockito.when(response.getWriter()).thenReturn(printWriter);
+        // Act
+        addressServlet.doPut(request, response);
+
+        // Assert
+        Mockito.verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        Mockito.verify(response.getWriter()).println("Address ID is required");
+    }
+
+    @Test
+    void testDoDeleteWithValidId() throws ServletException, IOException, CustomerNotFoundException, SQLException {
+        // Arrange
+        Long addressId = 1L;
+        Mockito.when(request.getPathInfo()).thenReturn("/" + addressId);
+        // Act
+        addressServlet.doDelete(request, response);
+
+        // Assert
+        Mockito.verify(response).setStatus(HttpServletResponse.SC_OK);
+    }
+
+    @Test
+    void testDoDeleteWithInvalidId() throws ServletException, IOException, CustomerNotFoundException, SQLException {
+        // Arrange
+        Mockito.lenient().when(response.getWriter()).thenReturn(printWriter);
+        Mockito.lenient().when(request.getPathInfo()).thenReturn("/");
+
 
         // Act
-        orderServlet.doDelete(request, response);
+        addressServlet.doDelete(request, response);
 
         // Assert
         Mockito.verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
     }
+
 
     private ServletInputStream getInputStream(Object obj) throws IOException {
         StringWriter writer = new StringWriter();
         objectMapper.writeValue(writer, obj);
         return new TestServletInputStream(new ByteArrayInputStream(writer.toString().getBytes()));
     }
+
 
     private static class TestServletInputStream extends ServletInputStream {
         private final InputStream inputStream;
@@ -216,7 +214,7 @@ class OrderServletTest {
 
         @Override
         public void setReadListener(ReadListener readListener) {
+
         }
     }
 }
-

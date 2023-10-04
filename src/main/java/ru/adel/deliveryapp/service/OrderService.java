@@ -22,4 +22,5 @@ public interface OrderService extends Serializable {
 
     void updateOrderStatusDelivered(Long orderId) throws SQLException;
 
+
 }

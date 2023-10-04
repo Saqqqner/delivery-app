@@ -12,26 +12,26 @@ CREATE TABLE IF NOT EXISTS Customers (
     );
 CREATE TABLE IF NOT EXISTS Products (
                                        id SERIAL PRIMARY KEY,
-                                       name VARCHAR(255) NOT NULL,
+                                       name VARCHAR(255) NOT NULL unique,
     description TEXT,
     price DECIMAL(10, 2) NOT NULL,
     stock BIGINT NOT NULL
     );
 CREATE TABLE IF NOT EXISTS Orders  (
                                      id SERIAL PRIMARY KEY,
-                                     customer_id BIGINT NOT NULL,
-                                     shipping_address_id BIGINT NOT NULL,
+                                     customer_id BIGINT ,
+                                     shipping_address_id BIGINT ,
                                      status VARCHAR(255) NOT NULL,
                                      total_price DECIMAL(10, 2) NOT NULL,
-                                     FOREIGN KEY (customer_id) REFERENCES Customers(id),
-    FOREIGN KEY (shipping_address_id) REFERENCES Address(id)
+                                     FOREIGN KEY (customer_id) REFERENCES Customers(id)  on DELETE set NULL ,
+    FOREIGN KEY (shipping_address_id) REFERENCES Address(id) on DELETE set NULL
     );
-CREATE TABLE IF NOT EXISTS OrderItems (
+CREATE TABLE IF NOT EXISTS Order_Items (
                                          id SERIAL PRIMARY KEY,
                                          order_id BIGINT NOT NULL,
-                                         product_id BIGINT NOT NULL,
+                                         product_id BIGINT ,
                                          quantity BIGINT NOT NULL,
                                          product_total_price DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES Orders(id),
-    FOREIGN KEY (product_id) REFERENCES Products(id)
+    FOREIGN KEY (order_id) REFERENCES Orders(id)  on DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES Products(id) on DELETE set null
     );
