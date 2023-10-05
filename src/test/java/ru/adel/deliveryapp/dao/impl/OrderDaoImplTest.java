@@ -24,7 +24,7 @@ import java.util.Optional;
 @ExtendWith(MockitoExtension.class)
 class OrderDaoImplTest {
     @Container
-    private static final PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:latest").withInitScript("scripts-order.sql");
+    private  final PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:latest").withInitScript("scripts-order.sql");
 
     private SessionManager sessionManager;
     private OrderDaoImpl orderDao;
@@ -32,23 +32,18 @@ class OrderDaoImplTest {
     private Customer customer;
     private Address address;
 
-    @BeforeAll
-    public static void beforeAll() {
+
+     @BeforeEach
+    void setUp() {
+        postgresContainer.start();
+        postgresContainer.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger(AddressDaoImplTest.class)));
+
         System.setProperty("jdbc.url", postgresContainer.getJdbcUrl());
         System.setProperty("jdbc.username", postgresContainer.getUsername());
         System.setProperty("jdbc.password", postgresContainer.getPassword());
-        postgresContainer.start();
-        postgresContainer.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger(OrderItemDaoImplTest.class)));
 
-    }
+        CustomDataSourceConfig.updateDataSourceProperties();
 
-    @AfterAll
-    public static void afterAll() {
-        postgresContainer.stop();
-    }
-
-    @BeforeEach
-    void setUp()   {
         dataSource = CustomDataSourceConfig.getHikariDataSource();
         sessionManager = new SessionManagerJdbc(dataSource);
         orderDao = new OrderDaoImpl(sessionManager);
@@ -56,8 +51,13 @@ class OrderDaoImplTest {
         address = new Address();
         customer.setId(1L);
         address.setId(1L);
-
     }
+
+    @AfterEach
+    void tearDown() {
+        postgresContainer.stop();
+    }
+
 
     @Test
     void findById_shouldReturnOrder() throws SQLException {

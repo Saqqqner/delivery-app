@@ -27,25 +27,25 @@ class ProductDaoImplTest {
     private DataSource dataSource;
 
 
-    @BeforeAll
-    public static void beforeAll() {
+    @BeforeEach
+    void setUp() {
+        postgresContainer.start();
+        postgresContainer.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger(AddressDaoImplTest.class)));
+
         System.setProperty("jdbc.url", postgresContainer.getJdbcUrl());
         System.setProperty("jdbc.username", postgresContainer.getUsername());
         System.setProperty("jdbc.password", postgresContainer.getPassword());
-        postgresContainer.start();
-        postgresContainer.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger(AddressDaoImplTest.class)));
-    }
 
-    @AfterAll
-    public static void afterAll() {
-        postgresContainer.stop();
-    }
+        CustomDataSourceConfig.updateDataSourceProperties();
 
-    @BeforeEach
-    void setUp() throws SQLException {
         dataSource = CustomDataSourceConfig.getHikariDataSource();
         sessionManager = new SessionManagerJdbc(dataSource);
         productDao = new ProductDaoImpl(sessionManager);
+    }
+
+    @AfterEach
+    void tearDown() {
+        postgresContainer.stop();
     }
 
 

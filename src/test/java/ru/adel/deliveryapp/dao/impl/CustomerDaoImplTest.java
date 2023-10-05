@@ -19,9 +19,9 @@ import java.util.Optional;
 
 @Testcontainers
 @ExtendWith(MockitoExtension.class)
-public class CustomerDaoImplTest {
+class CustomerDaoImplTest {
     @Container
-    private static final PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:latest").withInitScript("scripts.sql");
+    private  final PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:latest").withInitScript("scripts.sql");
 
 
     private SessionManager sessionManager;
@@ -31,25 +31,25 @@ public class CustomerDaoImplTest {
 
     private DataSource dataSource;
 
-    @BeforeAll
-    public static void beforeAll() {
+    @BeforeEach
+    void setUp() {
+        postgresContainer.start();
+        postgresContainer.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger(AddressDaoImplTest.class)));
+
         System.setProperty("jdbc.url", postgresContainer.getJdbcUrl());
         System.setProperty("jdbc.username", postgresContainer.getUsername());
         System.setProperty("jdbc.password", postgresContainer.getPassword());
-        postgresContainer.start();
-        postgresContainer.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger(AddressDaoImplTest.class)));
-    }
 
-    @AfterAll
-    public static void afterAll() {
-        postgresContainer.stop();
-    }
+        CustomDataSourceConfig.updateDataSourceProperties();
 
-    @BeforeEach
-    void setUp() throws SQLException {
         dataSource = CustomDataSourceConfig.getHikariDataSource();
         sessionManager = new SessionManagerJdbc(dataSource);
         customerDao = new CustomerDaoImpl(sessionManager);
+    }
+
+    @AfterEach
+    void tearDown() {
+        postgresContainer.stop();
     }
 
 

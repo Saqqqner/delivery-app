@@ -13,7 +13,7 @@ public class CustomDataSourceConfig {
     private static final String URL = System.getProperty("jdbc.url", "jdbc:postgresql://localhost:5332/delivery_app_db");
 
     private static final HikariConfig config = new HikariConfig();
-    private static final HikariDataSource dataSource;
+    private static  HikariDataSource dataSource;
 
     static {
         config.setJdbcUrl(URL);
@@ -30,6 +30,21 @@ public class CustomDataSourceConfig {
 
         dataSource = new HikariDataSource(config);
     }
+    public static void updateDataSourceProperties() {
+        String user = System.getProperty("jdbc.username", "your_default_username");
+        String password = System.getProperty("jdbc.password", "your_default_password");
+        String url = System.getProperty("jdbc.url", "jdbc:postgresql://localhost:5332/delivery_app_db");
+
+        config.setJdbcUrl(url);
+        config.setUsername(user);
+        config.setPassword(password);
+        if (dataSource != null) {
+            dataSource.close();
+        }
+
+        dataSource = new HikariDataSource(config);
+    }
+
 
     private CustomDataSourceConfig() {
     }

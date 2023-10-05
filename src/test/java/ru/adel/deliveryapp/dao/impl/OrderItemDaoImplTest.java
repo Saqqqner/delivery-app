@@ -21,7 +21,7 @@ import java.util.List;
 @Testcontainers
 class OrderItemDaoImplTest {
     @Container
-    private static final PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:latest").withInitScript("scripts-orderitem.sql");
+    private  final PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:latest").withInitScript("scripts-orderitem.sql");
 
     private SessionManager sessionManager;
     private OrderItemDao orderItemDao;
@@ -32,23 +32,17 @@ class OrderItemDaoImplTest {
     private Order order1;
 
 
-    @BeforeAll
-    public static void beforeAll() {
+    @BeforeEach
+    void setUp() throws SQLException{
+        postgresContainer.start();
+        postgresContainer.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger(AddressDaoImplTest.class)));
+
         System.setProperty("jdbc.url", postgresContainer.getJdbcUrl());
         System.setProperty("jdbc.username", postgresContainer.getUsername());
         System.setProperty("jdbc.password", postgresContainer.getPassword());
-        postgresContainer.start();
-        postgresContainer.followOutput(new Slf4jLogConsumer(LoggerFactory.getLogger(OrderItemDaoImplTest.class)));
 
-    }
+        CustomDataSourceConfig.updateDataSourceProperties();
 
-    @AfterAll
-    public static void afterAll() {
-        postgresContainer.stop();
-    }
-
-    @BeforeEach
-    void setUp() throws SQLException {
         dataSource = CustomDataSourceConfig.getHikariDataSource();
         sessionManager = new SessionManagerJdbc(dataSource);
         orderItemDao = new OrderItemDaoImpl(sessionManager);
@@ -60,6 +54,13 @@ class OrderItemDaoImplTest {
         order1.setId(2L);
         createOrderItems();
     }
+
+    @AfterEach
+    void tearDown() {
+        postgresContainer.stop();
+    }
+
+
 
     @Test
     void findAllByOrderId_shouldReturnOrder() throws SQLException {
